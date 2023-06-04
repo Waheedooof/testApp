@@ -1,0 +1,77 @@
+name: test_maker
+description: A new Flutter project for making tests with excel files
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+#version: 1.0.0+1
+version: 9.0.0
+
+environment:
+  sdk: '>=2.18.4 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  cupertino_icons: ^1.0.2
+  flutter_lints: ^2.0.0
+  excel: ^2.0.4
+  csv: ^5.0.1
+  path: ^1.8.0
+  get: ^4.6.5
+#  dartz: ^0.10.1
+  http: ^0.13.5
+  file_picker: ^5.2.6
+  path_provider: ^2.0.14
+  filesystem_picker: ^3.1.0
+  device_apps: ^2.2.0
+  url_launcher: ^6.1.10
+  share_plus: ^6.3.4
+  easy_localization: ^3.0.0
+  device_preview: ^1.1.0  #^0.7.5
+  flutter_launcher_icons: ^0.12.0
+  sensors: ^2.0.0
+  animated_theme_switcher: ^2.0.8
+  shared_preferences: ^2.1.1
+
+
+
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/playstore.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/playstore.png"
+  min_sdk_android: 21
+#  web:
+#    generate: true
+#    image_path: "path/to/image.png"
+#    background_color: "#hexcode"
+#    theme_color: "#hexcode"
+
+flutter:
+
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/translations/ar-DZ.json
+    - assets/translations/en-US.json
+    - assets/images/
+
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo-Bold.ttf
+        - asset: assets/fonts/Cairo-ExtraLight.ttf
+          weight: 700

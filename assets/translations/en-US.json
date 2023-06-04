@@ -1,0 +1,70 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+  "lang": "عربي",
+  "choose": "Choose File",
+  "choose_lang": "Choose Language",
+  "read": "Read New File",
+  "write": "Write File",
+  "type": "Type File Name",
+  "connect_us": "Connect Us",
+  "open?": "Open File ? You Save Csv File in :",
+  "delete?": "Delete This Question ?",
+  "deleteFile?": "Delete This File ?",
+  "ok": "Ok",
+  "type_q": "Add Question",
+  "answer": "Answer Number",
+  "index_answer": "Correct ANS",
+  "share_label": "Open File With TestApp\nDownload App : ",
+  "empty": "Empty value",
+  "no_data": "No Questions Yet",
+  "recently": "Your Files",
+  "dont_have": "No Files",
+  "results": "Results",
+  "trueAnswers": "Correct Answers",
+  "falseAnswers": "Incorrect Answers",
+  "count": "Answers Count",
+  "avg": "Average",
+  "share": "Share File",
+  "exam_mode": "Exam Mode",
+  "not_exit": "Did not exit the application\nYou are in exam mode",
+  "you_exit": "You have exited the app so\nYou are not in exam mode\nRestart The App",
+  "favorite": "Favorites",
+  "question": "Question",
+  "edit": "Edit Question",
+  "mark": "Mark",
+  "changeList": "Reverse the list",
+  "start": "Start timer",
+  "stop": "Stop timer",
+  "cancel": "Cancel timer",
+  "resume": "Resume timer",
+  "min": "Minute",
+  "history": "History",
+  "walk": "Walking Mode",
+  "openFilesList": "Open List",
+  "close": "Press to exit",
+  "noInfo": "No Explain ... Add",
+  "info": "Explain",
+  "theme": "Night Mode",
+  "themeLight": "Light Mode",
+  "NotEditAble": "Your Edit On This File Will Not Applied When You Share It",
+  "EditAble": "Your Edit will be applied to this file When You Share It",
+  "show_answers": "Show Correct Answers",
+  "hide_answers": "Hide Correct Answers"
+
+
+}
