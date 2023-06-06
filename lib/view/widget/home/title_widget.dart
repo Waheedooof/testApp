@@ -73,6 +73,7 @@ class TitleWidget extends StatelessWidget {
           '${tr('mark')} ${examControllerBuild.trueSum}',
           style: TextStyle(
             color: Get.theme.scaffoldBackgroundColor,
+            fontSize: 12,
           ),
         ),
       ),
@@ -105,7 +106,18 @@ class TitleWidget extends StatelessWidget {
                                 'you_exit',
                                 style: TextStyle(color: Colors.grey),
                                 textAlign: TextAlign.center,
-                              ).tr()
+                              ).tr(),
+                              ElevatedButton(
+                                onPressed: () {
+                                  excelFileController.changeReadMode();
+                                  examControllerBuild.setCheat();
+                                  Get.back();
+                                },
+                                child: Text(excelFileController.readMode
+                                    ? 'hide_answers'
+                                    : 'show_answers')
+                                    .tr(),
+                              ),
                             ],
                           )
                         : Column(
@@ -183,7 +195,10 @@ class TitleWidget extends StatelessWidget {
                 ),
                 Text(
                   '${tr('min')} ${(examControllerBuild.minutes / 60).ceil()}',
-                  style: TextStyle(color: Get.theme.scaffoldBackgroundColor),
+                  style: TextStyle(
+                    color: Get.theme.scaffoldBackgroundColor,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -247,7 +262,9 @@ class TitleWidget extends StatelessWidget {
                 ),
           AnimatedContainer(
             duration: const Duration(seconds: 1),
-            width: excelFileController.searchQuestionsMode?Get.width/9:Get.width/7,
+            width: excelFileController.searchQuestionsMode
+                ? Get.width / 9
+                : Get.width / 7,
             child: excelFileController.searchQuestionsMode
                 ? IconButton(
                     onPressed: () {

@@ -1,9 +1,10 @@
+import 'dart:io';
+import 'package:csv/csv.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:io';
-import 'package:csv/csv.dart';
 import 'dart:async' show Future;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -13,6 +14,7 @@ import 'package:test_maker/core/constant/file.dart';
 import 'package:test_maker/core/services/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constant/approutes.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 class ExcelFileController extends GetxController {
   List<List<dynamic>> csvTable = [];
@@ -25,12 +27,15 @@ class ExcelFileController extends GetxController {
   bool searchQuestionsMode = false;
   TextEditingController searchQuestionController = TextEditingController();
   bool readMode = false;
-
   changeReadMode() {
     readMode = !readMode;
   }
 
   displayDrawer(BuildContext context) {
+    FilesController filesController=Get.find();
+    if(filesController.showFilesList){
+      filesController.changeShowList();
+    }
     scaffoldKey.currentState!.openDrawer();
   }
 
@@ -47,11 +52,26 @@ class ExcelFileController extends GetxController {
     super.onInit();
   }
 
-  Future createFile(fileName) async {
+//getExternalStorageDirectory
+  Future createFile2(fileName) async {
     String csvData = const ListToCsvConverter().convert([]);
     String directory = (await getExternalStorageDirectory())!.path;
     final path = "$directory/$fileName-${DateTime.now().year}.csv";
     final File file = File(path);
+
+    await file.writeAsString(csvData);
+    Get.back();
+    pickFile(path);
+    FilesController filesController = Get.find();
+    filesController.getListFiles();
+  }
+
+  Future createFile(fileName) async {
+    String csvData = const ListToCsvConverter().convert([]);
+    String directory = (await getExternalStorageDirectory())!.path;
+    final path = "$directory/$fileName-${DateTime.now().year}.csv";
+    File file = File(path);
+
     await file.writeAsString(csvData);
     Get.back();
     pickFile(path);
@@ -66,7 +86,16 @@ class ExcelFileController extends GetxController {
     } else {
       filePath = getSavedPath();
     }
+
+    // for(int index=0;index<5;index++){
+    //   if(newData.first[index]!='') {
+    //     newData.first[index]=encodeText(newData.first[index]);
+    //     print(newData.first[index]+' : '+encodeText(newData.first[index]));
+    //   }
+    // }
+
     for (List rowList in csvTable) {
+      // rowList.assign(csvTable.length);
       newData.add(rowList);
     }
     String csvData = const ListToCsvConverter().convert(newData);
@@ -77,7 +106,27 @@ class ExcelFileController extends GetxController {
       mode: FileMode.write,
     );
     getFileData(filePath);
-    print('$filePath edit');
+  }
+
+  getFileData(filePath) async {
+    try {
+      data = '';
+      fileTitle = filePath;
+      update();
+      File file = File(filePath);
+      data = file.readAsStringSync();
+      csvTable = const CsvToListConverter().convert(data);
+      print(fileTitle);
+      print(csvTable);
+      print('======filePath===$filePath=======');
+    } catch (e) {
+      csvTable = [];
+      data = 'File Not Found';
+    }
+    if (data.isEmpty) {
+      data = 'No Questions has Added';
+    }
+    update();
   }
 
   refreshList() async {
@@ -108,28 +157,6 @@ class ExcelFileController extends GetxController {
       text: '${tr('share_label')}\n$fileUrl',
       paths,
     );
-  }
-
-  getFileData(filePath) async {
-    try {
-      data = '';
-      fileTitle = filePath;
-      update();
-      File file = File(filePath);
-      data = file.readAsStringSync();
-      csvTable = const CsvToListConverter().convert(data);
-      print(fileTitle);
-      print('======lastModified===${await file.lastModified()}=======');
-      print(csvTable);
-      print('======filePath===$filePath=======');
-    } catch (e) {
-      csvTable = [];
-      data = 'File Not Found';
-    }
-    if (data.isEmpty) {
-      data = 'No Questions has Added';
-    }
-    update();
   }
 
   Future<int> deleteFile(String path) async {
@@ -245,7 +272,7 @@ class ExcelFileController extends GetxController {
     Get.toNamed(AppRoute.writeFilePage);
   }
 
-  void writeData() async {
+  void writeQuesData() async {
     if (_myServices.sharedPreferences.containsKey('tablePath')) {
       if (questionAddRow.first.isEmpty ||
           questionAddRow[2].isEmpty ||
@@ -336,10 +363,14 @@ class ExcelFileController extends GetxController {
 
   isFileEditAble() {
     FilesController filesController = Get.find();
-    for (File file in filesController.files) {
-      if (file.path == fileTitle) {
-        return true;
+    try {
+      for (File file in filesController.files) {
+        if (file.path == fileTitle) {
+          return true;
+        }
       }
+    } catch (e) {
+      return false;
     }
     return false;
   }
@@ -375,4 +406,33 @@ class ExcelFileController extends GetxController {
       throw 'Could not launch $url';
     }
   }
+
+// String encodeText(String text) {
+//   final plainText = text; // Text to encrypt
+//
+//   final key = encrypt.Key.fromLength(32); // Generate a 256-bit key
+//   final iv = encrypt.IV.fromLength(16); // Generate a 128-bit IV
+//
+//   final encrypter = encrypt.Encrypter(AES(key)); // Use AES encryption
+//
+//   // Encrypt the text
+//   final encrypted = encrypter.encrypt(plainText, iv: iv);
+//
+//   // print('Encrypted Text: ${encrypted.base64}');
+//
+//   return encrypted.base64.toString();
+// }
+//
+// String decodeText(String encryptText) {
+//   final encryptedText = encryptText;
+//
+//   final key = encrypt.Key.fromLength(32);
+//   final iv = IV.fromLength(16);
+//
+//   final encrypter = Encrypter(AES(key)); // Use AES encryption
+//
+//   final encrypted = Encrypted.fromBase64(encryptedText);
+//
+//   return encrypter.decrypt(encrypted, iv: iv);
+// }
 }

@@ -5,11 +5,19 @@ import 'package:test_maker/core/services/services.dart';
 
 import '../core/theme/themes.dart';
 
-class ThemeController extends GetxController {
+
+
+class ThemeController extends GetxController with SingleGetTickerProviderMixin {
   MyServices myServices = Get.find();
+  late AnimationController controller;
 
   @override
   void onInit() {
+    super.onInit();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     if (myServices.sharedPreferences.get('theme') == 'dark') {
       Get.changeThemeMode(ThemeMode.dark);
     } else {
@@ -18,6 +26,24 @@ class ThemeController extends GetxController {
     update();
     super.onInit();
   }
+
+  @override
+  void onClose() {
+    controller.dispose();
+    super.onClose();
+  }
+
+  void toggleAnimation() {
+    if (controller.isCompleted) {
+      controller.reverse();
+    } else {
+      controller.forward();
+    }
+  }
+
+  bool get isAnimating => controller.isAnimating;
+
+  Animation<double> get animation => controller;
 
   ThemeMode getThemeMode() {
     if (myServices.sharedPreferences.get('theme') == 'dark') {
@@ -52,6 +78,7 @@ class ThemeController extends GetxController {
       );
       // Get.changeThemeMode(ThemeMode.dark);
     }
-    update();
+    toggleAnimation();
+    // update();
   }
 }

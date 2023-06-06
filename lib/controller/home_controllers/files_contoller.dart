@@ -13,6 +13,10 @@ class FilesController extends GetxController {
 
   TextEditingController searchController = TextEditingController();
 
+  bool showFilesList = false;
+  bool searchMode = false;
+
+
   @override
   void onInit() {
     getListFiles();
@@ -20,16 +24,18 @@ class FilesController extends GetxController {
     super.onInit();
   }
 
+  changeShowList(){
+    showFilesList=!showFilesList;
+    update();
+  }
   // Make New Function
   void getListFiles() async {
-    final directory = await getExternalStorageDirectories();
+    final directory = await getExternalStorageDirectory();
 
     print('============listOfFiles==============');
-    print(directory!.first.path);
-    files = io.Directory(directory.first.path).listSync();
-    if (files.isNotEmpty) {
-      print(files.first);
-    }
+    print(directory!.path);
+    files = io.Directory(directory.path).listSync();
+        print(files.length);
 
     update();
   }
@@ -55,17 +61,20 @@ class FilesController extends GetxController {
   }
 
   selectedFiles(index) {
-    if (deleteIndexFiles.contains(index)) {
-      deleteIndexFiles.remove(index);
-    } else {
-      deleteIndexFiles.add(index);
-    }
-    // print(files[index]);
-    for (int element in deleteIndexFiles) {
-      print('============================');
-      print(element);
-      print(files.indexOf(files[element]));
-    }
+
+      if (deleteIndexFiles.contains(index)) {
+        deleteIndexFiles.remove(index);
+      } else {
+        deleteIndexFiles.add(index);
+      }
+      // print(files[index]);
+      for (int element in deleteIndexFiles) {
+        print('============================');
+        print(element);
+        print(files.indexOf(files[element]));
+      }
+
+
     update();
   }
 
@@ -82,8 +91,7 @@ class FilesController extends GetxController {
     update();
   }
 
-  bool searchMode = false;
-  void search() {
+  void changeSearchMode() {
     searchMode=!searchMode;
     update();
   }

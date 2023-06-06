@@ -105,7 +105,7 @@ class AddPage extends StatelessWidget {
     return FloatingActionButton(
       heroTag: 'add_hero',
       onPressed: () {
-        excelFileController.writeData();
+        excelFileController.writeQuesData();
       },
       child: const Icon(Icons.done),
     );

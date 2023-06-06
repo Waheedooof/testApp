@@ -28,22 +28,25 @@ class WriteFilePage extends StatelessWidget {
           },
           child: const Icon(Icons.done),
         ),
-
-        body: AppCustomAppBar(title: const Text('type').tr(), actions: [],body: Center(
-          child: Container(
-            margin: const EdgeInsets.all(30),
-            child: TextFormField(
-              initialValue: 'default_Name',
-              style: Get.textTheme.bodyText1,
-              selectionControls: CupertinoTextSelectionControls(),
-              autofocus: true,
-              textAlign: TextAlign.center,
-              onChanged: (value) {
-                name = value;
-              },
+        body: AppCustomAppBar(
+          title: const Text('type').tr(),
+          actions: [],
+          body: Center(
+            child: Container(
+              margin: const EdgeInsets.all(30),
+              child: TextFormField(
+                initialValue: 'default_Name',
+                style: Get.textTheme.bodyText1,
+                selectionControls: CupertinoTextSelectionControls(),
+                autofocus: true,
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  name = value;
+                },
+              ),
             ),
           ),
-        ),),
+        ),
       ),
     );
   }

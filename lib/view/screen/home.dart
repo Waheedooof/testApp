@@ -180,7 +180,7 @@ class HomePage extends StatelessWidget {
         },
       ),
       expandedHeight: Get.height / 7,
-      toolbarHeight: Get.height / 18,
+      toolbarHeight: Get.height / 17,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Get.theme.scaffoldBackgroundColor,
         statusBarIconBrightness: Get.theme.brightness,

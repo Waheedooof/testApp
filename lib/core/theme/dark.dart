@@ -20,7 +20,7 @@ class DarkThemeApp {
       titleTextStyle: TextStyle(
         fontFamily: 'Cairo',
         color: AppColor.darkPrimary,
-        fontSize: 14,
+        fontSize: 18,
       ),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: AppColor.darkScaffold,

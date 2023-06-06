@@ -15,7 +15,8 @@ class ChooseLangPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('choose_lang').tr()),
       body: Center(
-        child: Card(
+        child: Container(
+          color: context.theme.primaryColor.withOpacity(0.4),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -41,11 +42,13 @@ class ChooseLangPage extends StatelessWidget {
                 ),
               ),
               Divider(
-                height: Get.height / 5,
+                height: context.height / 5,
               ),
               Container(
-                color: Get.theme.primaryColor.withOpacity(0.2),
-                width: Get.width / 1.2,
+                width: context.width / 1.2,
+                decoration: BoxDecoration(
+                    color: context.theme.primaryColor.withOpacity(0.2),
+                    borderRadius: const BorderRadius.all(Radius.circular(22))),
                 child: InkWell(
                   onTap: () {
                     context.locale = const Locale('en', 'US');
@@ -60,12 +63,12 @@ class ChooseLangPage extends StatelessWidget {
                         'assets/images/en.png',
                       ),
                       SizedBox(
-                        width: Get.width / 8,
+                        width: context.width / 8,
                       ),
                       Text(
                         'English',
                         style: TextStyle(
-                          color: Get.theme.scaffoldBackgroundColor,
+                          color: context.theme.scaffoldBackgroundColor,
                         ),
                       ),
                     ],
@@ -76,8 +79,10 @@ class ChooseLangPage extends StatelessWidget {
                 height: 20,
               ),
               Container(
-                color: Get.theme.primaryColor.withOpacity(0.2),
-                width: Get.width / 1.2,
+                decoration: BoxDecoration(
+                    color: context.theme.primaryColor.withOpacity(0.2),
+                    borderRadius: const BorderRadius.all(Radius.circular(22))),
+                width: context.width / 1.2,
                 child: InkWell(
                   onTap: () {
                     context.locale = const Locale('ar', 'DZ');
@@ -92,12 +97,12 @@ class ChooseLangPage extends StatelessWidget {
                         'assets/images/ar.png',
                       ),
                       SizedBox(
-                        width: Get.width / 8,
+                        width: context.width / 8,
                       ),
                       Text(
                         'عربي',
                         style: TextStyle(
-                          color: Get.theme.scaffoldBackgroundColor,
+                          color: context.theme.scaffoldBackgroundColor,
                         ),
                       ),
                     ],

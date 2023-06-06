@@ -10,10 +10,11 @@ class MiddleWare extends GetMiddleware {
 
   @override
   RouteSettings? redirect(String? route) {
-    if (_myServices.sharedPreferences.containsKey('lang')) {
+    if (!_myServices.sharedPreferences.containsKey('lang')) {
       // return RouteSettings(name: AppRoute.homePage);
-    } else {
       return RouteSettings(name: AppRoute.chooseLang);
-    }
+    } else if (!_myServices.sharedPreferences.containsKey('auth')) {
+      return RouteSettings(name: AppRoute.authPage);
+    } else {}
   }
 }

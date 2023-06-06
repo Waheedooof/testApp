@@ -10,7 +10,7 @@ AppBar appCustomAppBar2({
 
     title: title,
     actions: actions,
-    toolbarHeight: Get.height / 10,
+    toolbarHeight: Get.height / 17,
     leading: IconButton(
       icon: Icon(
         Icons.arrow_back_ios,

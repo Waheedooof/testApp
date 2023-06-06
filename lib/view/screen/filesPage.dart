@@ -120,12 +120,18 @@ class FilesPage extends StatelessWidget {
               Expanded(
                 child: Container(),
               ),
-              filesController.deleteIndexFiles.contains(index)
-                  ? CircleAvatar(
-                      radius: 10,
-                      backgroundColor: Get.theme.primaryColor,
-                    )
-                  : Container()
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 800),
+                margin: filesController.deleteIndexFiles.contains(index)
+                    ? const EdgeInsets.symmetric(horizontal: 8)
+                    : const EdgeInsets.symmetric(horizontal: 0),
+                child: filesController.deleteIndexFiles.contains(index)
+                    ? CircleAvatar(
+                        radius: 10,
+                        backgroundColor: Get.theme.primaryColor,
+                      )
+                    : Container(),
+              )
             ],
           ),
         ),
@@ -139,6 +145,25 @@ class FilesPage extends StatelessWidget {
         if (filesController.deleteIndexFiles.isNotEmpty) {
           return Row(
             children: [
+              filesController.searchMode
+                  ? IconButton(
+                      onPressed: () async {
+                        filesController.closeSearch();
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Get.theme.primaryColor,
+                      ),
+                    )
+                  : IconButton(
+                      onPressed: () async {
+                        await filesController.selectedFilesAll();
+                      },
+                      icon: Icon(
+                        Icons.select_all,
+                        color: Get.theme.primaryColor,
+                      ),
+                    ),
               IconButton(
                 onPressed: () async {
                   showDialog(
@@ -161,19 +186,9 @@ class FilesPage extends StatelessWidget {
                       ),
                     ),
                   );
-                  ;
                 },
                 icon: Icon(
                   Icons.delete_outline,
-                  color: Get.theme.primaryColor,
-                ),
-              ),
-              IconButton(
-                onPressed: () async {
-                  await filesController.selectedFilesAll();
-                },
-                icon: Icon(
-                  Icons.select_all,
                   color: Get.theme.primaryColor,
                 ),
               ),
@@ -204,7 +219,7 @@ class FilesPage extends StatelessWidget {
                   )
                 : IconButton(
                     onPressed: () async {
-                      filesController.search();
+                      filesController.changeSearchMode();
                     },
                     icon: Icon(
                       Icons.search,
@@ -240,37 +255,38 @@ class FilesPage extends StatelessWidget {
           },
         ),
         body: AppCustomAppBar(
-            title: GetBuilder<FilesController>(
-              builder: (controller) {
-                if (controller.searchMode) {
-                  return CupertinoTextField(
-                    controller: controller.searchController,
-                    autofocus: true,
-                    onChanged: (value) {
-                      controller.update();
-                      print(controller.searchController.text);
-                    },
-                    textAlign: TextAlign.center,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Get.theme.primaryColor,
-                      ),
-                      color: Colors.grey.withOpacity(0.2),
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(10),
-                      ),
+          title: GetBuilder<FilesController>(
+            builder: (controller) {
+              if (controller.searchMode) {
+                return CupertinoTextField(
+                  controller: controller.searchController,
+                  autofocus: true,
+                  onChanged: (value) {
+                    controller.update();
+                    print(controller.searchController.text);
+                  },
+                  textAlign: TextAlign.center,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Get.theme.primaryColor,
                     ),
-                    style: Get.textTheme.bodyText1,
-                  );
-                } else {
-                  return const Text('recently').tr();
-                }
-              },
-            ),
-            actions: [
-              actionBtn(context),
-            ],
-            body: filesList()),
+                    color: Colors.grey.withOpacity(0.2),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  style: Get.textTheme.bodyText1,
+                );
+              } else {
+                return const Text('recently').tr();
+              }
+            },
+          ),
+          actions: [
+            actionBtn(context),
+          ],
+          body: filesList(),
+        ),
       ),
     );
   }

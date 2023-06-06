@@ -7,4 +7,5 @@ class AppRoute{
  static String addPage = '/addPage';
  static String chooseLang = '/chooseLang';
  static String filesPage = '/filesPage';
+ static String authPage = '/authPage';
 }

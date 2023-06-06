@@ -1,14 +1,12 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:sensors/sensors.dart';
-import 'package:test_maker/core/services/services.dart';
+import 'package:test_maker/controller/home_controllers/files_contoller.dart';
 
 class HomeController extends GetxController {
-  // ScrollController scrollController = ScrollController();
-  RxBool isUpScroll = true.obs;
   RxBool isReverseList = false.obs;
+  late ScrollController scrollController = ScrollController();
+
   // final MyServices _myServices = Get.find();
 
   bool isWalk = false;
@@ -18,16 +16,14 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
-    // scrollController.addListener(() {
-    //   if (scrollController.position.userScrollDirection ==
-    //       ScrollDirection.forward) {
-    //     isUpScroll.value = true;
-    //   } else {
-    //     isUpScroll.value = false;
-    //   }
-    // });
-
-
+    scrollController.addListener(
+      () {
+        FilesController filesController = Get.find();
+        if (filesController.showFilesList) {
+          filesController.changeShowList();
+        }
+      },
+    );
 
     gyroscopeEvents.listen((GyroscopeEvent event) {
       rotationX = event.x * 0.03;
@@ -47,6 +43,4 @@ class HomeController extends GetxController {
     isReverseList.value = !isReverseList.value;
     update();
   }
-
-
 }

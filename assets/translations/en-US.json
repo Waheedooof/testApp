@@ -17,8 +17,11 @@
 {
   "lang": "عربي",
   "choose": "Choose File",
+  "auth": "Authentication Password",
   "choose_lang": "Choose Language",
   "read": "Read New File",
+  "password": "Password",
+  "logout": "Logout",
   "write": "Write File",
   "type": "Type File Name",
   "connect_us": "Connect Us",
