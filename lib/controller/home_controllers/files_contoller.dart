@@ -16,7 +16,6 @@ class FilesController extends GetxController {
   bool showFilesList = false;
   bool searchMode = false;
 
-
   @override
   void onInit() {
     getListFiles();
@@ -24,10 +23,11 @@ class FilesController extends GetxController {
     super.onInit();
   }
 
-  changeShowList(){
-    showFilesList=!showFilesList;
+  changeShowList() {
+    showFilesList = !showFilesList;
     update();
   }
+
   // Make New Function
   void getListFiles() async {
     final directory = await getExternalStorageDirectory();
@@ -35,7 +35,7 @@ class FilesController extends GetxController {
     print('============listOfFiles==============');
     print(directory!.path);
     files = io.Directory(directory.path).listSync();
-        print(files.length);
+    print(files.length);
 
     update();
   }
@@ -51,7 +51,6 @@ class FilesController extends GetxController {
       await excelFileController.deleteFile(
         getPathFromFile(files[index]),
       );
-
     }
     deleteIndexFiles.clear();
     ExamController examController = Get.find();
@@ -61,19 +60,17 @@ class FilesController extends GetxController {
   }
 
   selectedFiles(index) {
-
-      if (deleteIndexFiles.contains(index)) {
-        deleteIndexFiles.remove(index);
-      } else {
-        deleteIndexFiles.add(index);
-      }
-      // print(files[index]);
-      for (int element in deleteIndexFiles) {
-        print('============================');
-        print(element);
-        print(files.indexOf(files[element]));
-      }
-
+    if (deleteIndexFiles.contains(index)) {
+      deleteIndexFiles.remove(index);
+    } else {
+      deleteIndexFiles.add(index);
+    }
+    // print(files[index]);
+    for (int element in deleteIndexFiles) {
+      print('============================');
+      print(element);
+      print(files.indexOf(files[element]));
+    }
 
     update();
   }
@@ -92,15 +89,15 @@ class FilesController extends GetxController {
   }
 
   void changeSearchMode() {
-    searchMode=!searchMode;
+    searchMode = !searchMode;
     update();
   }
 
   void closeSearch() {
-    if(searchController.text.isNotEmpty){
+    if (searchController.text.isNotEmpty) {
       searchController.clear();
-    }else{
-      searchMode=false;
+    } else {
+      searchMode = false;
     }
     update();
   }

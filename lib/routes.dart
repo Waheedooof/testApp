@@ -49,7 +49,7 @@ List<GetPage<dynamic>>? routes = [
     transition: Transition.rightToLeft,
   ),
   GetPage(
-    name: AppRoute.addPage,
+    name: AppRoute.addQuesPage,
     page: () =>  AddPage(),
     transition: Transition.rightToLeft,
   ),

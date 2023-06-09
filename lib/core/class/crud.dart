@@ -13,11 +13,11 @@ class Crud {
     try {
       if (await checkInternet()) {
         var response = await http.post(Uri.parse(urlLink), body: data);
+        print('==========Crud================');
+        print(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
           Map responceBody = jsonDecode(response.body);
           print('==========responceBody.length================');
-          print(responceBody.length);
-          print('==========Crud================');
           return Right(responceBody);
         } else {
           return const Left(StatusRequest.failure);

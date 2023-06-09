@@ -66,8 +66,8 @@ class DrawerWidget extends StatelessWidget {
                 click: () async {
                   excelFileController.toAddScreen();
                 },
-                title: Text(tr('type_q'), style: context.textTheme.bodyText1)
-                    .tr(),
+                title:
+                    Text(tr('type_q'), style: context.textTheme.bodyText1).tr(),
                 icon: Icon(CupertinoIcons.add_circled,
                     color: context.theme.highlightColor),
               ),
@@ -97,7 +97,7 @@ class DrawerWidget extends StatelessWidget {
                   Navigator.pushNamed(context, AppRoute.favoritePage);
                 },
                 title:
-                Text('favorite', style: context.textTheme.bodyText1).tr(),
+                    Text('favorite', style: context.textTheme.bodyText1).tr(),
                 icon: Icon(CupertinoIcons.star,
                     color: context.theme.highlightColor),
               ),
@@ -111,15 +111,14 @@ class DrawerWidget extends StatelessWidget {
                   Get.updateLocale(context.locale);
                 },
                 title: Text('lang', style: context.textTheme.bodyText1).tr(),
-                icon:
-                Icon(Icons.language, color: context.theme.highlightColor),
+                icon: Icon(Icons.language, color: context.theme.highlightColor),
               ),
               actionButton(
                 click: () async {
                   await excelFileController.connectUs();
                 },
-                title: Text('connect_us', style: context.textTheme.bodyText1)
-                    .tr(),
+                title:
+                    Text('connect_us', style: context.textTheme.bodyText1).tr(),
                 icon: Icon(Icons.feedback_outlined,
                     color: context.theme.highlightColor),
               ),
@@ -132,10 +131,10 @@ class DrawerWidget extends StatelessWidget {
                     'changeList',
                     style: context.textTheme.bodyText1,
                   ).tr(),
-                  leading: Icon(Icons.reorder,
-                      color: context.theme.highlightColor),
+                  leading:
+                      Icon(Icons.reorder, color: context.theme.highlightColor),
                   trailing: Obx(
-                        () => Switch(
+                    () => Switch(
                       value: homeController.isReverseList.value,
                       onChanged: (value) {
                         homeController.reverseList();
@@ -148,8 +147,7 @@ class DrawerWidget extends StatelessWidget {
                 click: () async {
                   Navigator.pushNamed(context, AppRoute.history);
                 },
-                title:
-                Text('history', style: context.textTheme.bodyText1).tr(),
+                title: Text('history', style: context.textTheme.bodyText1).tr(),
                 icon: Icon(
                   CupertinoIcons.square_list_fill,
                   color: context.theme.highlightColor,
@@ -170,8 +168,7 @@ class DrawerWidget extends StatelessWidget {
                     ),
                   );
                 },
-                title:
-                Text('logout', style: context.textTheme.bodyText1).tr(),
+                title: Text('logout', style: context.textTheme.bodyText1).tr(),
                 icon: Icon(
                   Icons.logout,
                   color: context.theme.highlightColor,

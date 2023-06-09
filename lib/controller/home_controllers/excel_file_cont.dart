@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:async' show Future;
@@ -14,7 +15,6 @@ import 'package:test_maker/core/constant/file.dart';
 import 'package:test_maker/core/services/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constant/approutes.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
 
 class ExcelFileController extends GetxController {
   List<List<dynamic>> csvTable = [];
@@ -26,14 +26,17 @@ class ExcelFileController extends GetxController {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   bool searchQuestionsMode = false;
   TextEditingController searchQuestionController = TextEditingController();
+  TextEditingController textQuesController = TextEditingController();
   bool readMode = false;
+  MyServices myServices = Get.find();
+
   changeReadMode() {
     readMode = !readMode;
   }
 
   displayDrawer(BuildContext context) {
-    FilesController filesController=Get.find();
-    if(filesController.showFilesList){
+    FilesController filesController = Get.find();
+    if (filesController.showFilesList) {
       filesController.changeShowList();
     }
     scaffoldKey.currentState!.openDrawer();
@@ -48,22 +51,7 @@ class ExcelFileController extends GetxController {
     if (_myServices.sharedPreferences.containsKey('tablePath')) {
       getFileData(getSavedPath());
     }
-
     super.onInit();
-  }
-
-//getExternalStorageDirectory
-  Future createFile2(fileName) async {
-    String csvData = const ListToCsvConverter().convert([]);
-    String directory = (await getExternalStorageDirectory())!.path;
-    final path = "$directory/$fileName-${DateTime.now().year}.csv";
-    final File file = File(path);
-
-    await file.writeAsString(csvData);
-    Get.back();
-    pickFile(path);
-    FilesController filesController = Get.find();
-    filesController.getListFiles();
   }
 
   Future createFile(fileName) async {
@@ -87,15 +75,7 @@ class ExcelFileController extends GetxController {
       filePath = getSavedPath();
     }
 
-    // for(int index=0;index<5;index++){
-    //   if(newData.first[index]!='') {
-    //     newData.first[index]=encodeText(newData.first[index]);
-    //     print(newData.first[index]+' : '+encodeText(newData.first[index]));
-    //   }
-    // }
-
     for (List rowList in csvTable) {
-      // rowList.assign(csvTable.length);
       newData.add(rowList);
     }
     String csvData = const ListToCsvConverter().convert(newData);
@@ -113,12 +93,10 @@ class ExcelFileController extends GetxController {
       data = '';
       fileTitle = filePath;
       update();
+      print('===0000000==000000000000==========');
       File file = File(filePath);
       data = file.readAsStringSync();
       csvTable = const CsvToListConverter().convert(data);
-      print(fileTitle);
-      print(csvTable);
-      print('======filePath===$filePath=======');
     } catch (e) {
       csvTable = [];
       data = 'File Not Found';
@@ -171,27 +149,25 @@ class ExcelFileController extends GetxController {
   }
 
   void pickFile(String path) async {
-    final directory = (await getApplicationSupportDirectory());
-
-    print('=========directory================');
-    print(directory);
     if (path == '') {
       //every run will assigned
       FilePickerResult? result = (await FilePicker.platform.pickFiles(
         allowMultiple: false,
         type: FileType.custom,
-        allowedExtensions: ['excel', 'csv', 'xls'],
+        allowedExtensions: ['csv'],
         // initialDirectory: '/data/user/0//',
       ))!;
-      _myServices.sharedPreferences
+    await  _myServices.sharedPreferences
           .setString('tablePath', result.files.first.path!);
-      getFileData(result.files.first.path!);
+     await getFileData(result.files.first.path!);
+      print('=========directory================');
+      print(result.files.first.path!);
       result = null;
     } else {
-      //on commit create btn clicked
       _myServices.sharedPreferences.setString('tablePath', path);
       getFileData(path);
     }
+    ExcelFileController().update();
   }
 
   String getSavedPath() {
@@ -203,11 +179,7 @@ class ExcelFileController extends GetxController {
     required int deletedRowIndex,
   }) async {
     String filePath = '';
-    if (getSavedPath() == null) {
-      Get.toNamed(AppRoute.writeFilePage);
-    } else {
-      filePath = getSavedPath();
-    }
+    filePath = getSavedPath();
     csvTable.remove(csvTable[deletedRowIndex]);
     String csvData = const ListToCsvConverter().convert(csvTable);
     final path = filePath;
@@ -265,7 +237,7 @@ class ExcelFileController extends GetxController {
   }
 
   void toAddScreen() {
-    Get.toNamed(AppRoute.addPage);
+    Get.toNamed(AppRoute.addQuesPage);
   }
 
   void toAddFileScreen() {
@@ -291,19 +263,22 @@ class ExcelFileController extends GetxController {
           ),
         );
       } else {
-        writeToFile(newData: [questionAddRow]);
+        await writeToFile(newData: [questionAddRow]);
         questionAddRow = ['', '', '', '', '', '', ''];
         ExamController examController = Get.find();
         examController.reset();
+        questionAddRow = ['', '', '', '', '', '', ''];
+        correctAnswer = 0;
+        textQuesController.text = '';
         update();
         Get.back();
-
-        Get.toNamed(AppRoute.addPage);
         await showEditAbleSnackBar();
+
+        await Get.toNamed(AppRoute.addQuesPage);
       }
     } else {
       Get.toNamed(AppRoute.writeFilePage)?.whenComplete(() {
-        Get.toNamed(AppRoute.addPage);
+        Get.toNamed(AppRoute.addQuesPage);
       });
     }
   }
@@ -407,32 +382,23 @@ class ExcelFileController extends GetxController {
     }
   }
 
-// String encodeText(String text) {
-//   final plainText = text; // Text to encrypt
-//
-//   final key = encrypt.Key.fromLength(32); // Generate a 256-bit key
-//   final iv = encrypt.IV.fromLength(16); // Generate a 128-bit IV
-//
-//   final encrypter = encrypt.Encrypter(AES(key)); // Use AES encryption
-//
-//   // Encrypt the text
-//   final encrypted = encrypter.encrypt(plainText, iv: iv);
-//
-//   // print('Encrypted Text: ${encrypted.base64}');
-//
-//   return encrypted.base64.toString();
-// }
-//
-// String decodeText(String encryptText) {
-//   final encryptedText = encryptText;
-//
-//   final key = encrypt.Key.fromLength(32);
-//   final iv = IV.fromLength(16);
-//
-//   final encrypter = Encrypter(AES(key)); // Use AES encryption
-//
-//   final encrypted = Encrypted.fromBase64(encryptedText);
-//
-//   return encrypter.decrypt(encrypted, iv: iv);
-// }
+  void copyToClipboard() {
+    Clipboard.setData(ClipboardData(text: textQuesController.text));
+  }
+
+  void textQuesCut() {
+    // copyToClipboard();
+    textQuesController.text = '';
+    setRowValue(0, textQuesController.text);
+    update();
+  }
+
+  void textQuesPaste() async {
+    ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (data != null) {
+      textQuesController.text = data.text ?? '';
+    }
+    setRowValue(0, textQuesController.text);
+    update();
+  }
 }

@@ -46,6 +46,7 @@ class AddPage extends StatelessWidget {
 
   textFieldWidget(int index, context) {
     return CupertinoTextField(
+      controller: index == 0 ? excelFileController.textQuesController : null,
       autofocus: true,
       textInputAction: TextInputAction.next,
       enabled: true,
@@ -65,6 +66,28 @@ class AddPage extends StatelessWidget {
         excelFileController.setRowValue(index, value);
       },
     );
+  }
+
+  copyPastButton(int index) {
+    if (index == 0) {
+      if (excelFileController.textQuesController.text.isEmpty) {
+        return TextButton(
+          onPressed: () {
+            excelFileController.textQuesPaste();
+          },
+          child: const Text('paste').tr(),
+        );
+      } else {
+        return TextButton(
+          onPressed: () {
+            excelFileController.textQuesCut();
+          },
+          child: const Text('cut').tr(),
+        );
+      }
+    } else {
+      return Container();
+    }
   }
 
   labelWidget(int index) {
@@ -113,8 +136,6 @@ class AddPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    excelFileController.questionAddRow = ['', '', '', '', '', '', ''];
-    excelFileController.correctAnswer = 0;
 
     return GestureDetector(
       onHorizontalDragEnd: (DragEndDetails details) {
@@ -147,38 +168,42 @@ class AddPage extends StatelessWidget {
                                 .where((element) => element != '')
                                 .length;
 
-                            return index == 7
-                                ? Container(
-                                    color: Get.theme.scaffoldBackgroundColor,
-                                    height: Get.height / 12,
-                                  )
-                                : (index == 0 ||
-                                        index == 6 ||
-                                        excelFileController
-                                            .questionAddRow[index - 1]
-                                            .isNotEmpty)
-                                    ? Container(
-                                        margin:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            labelWidget(index),
-                                            Expanded(
-                                              child: index == 6
-                                                  ? chooseAnswerIndexWidget(
-                                                      lengthOfChooses,
-                                                    )
-                                                  : textFieldWidget(
-                                                      index,
-                                                      context,
-                                                    ),
+                            if (index == 7) {
+                              return Container(
+                                color: Get.theme.scaffoldBackgroundColor,
+                                height: Get.height / 12,
+                              );
+                            } else if (index == 0 ||
+                                index == 6 ||
+                                excelFileController
+                                    .questionAddRow[index - 1].isNotEmpty) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        labelWidget(index),
+                                        copyPastButton(index)
+                                      ],
+                                    ),
+                                    Expanded(
+                                      child: index == 6
+                                          ? chooseAnswerIndexWidget(
+                                              lengthOfChooses,
+                                            )
+                                          : textFieldWidget(
+                                              index,
+                                              context,
                                             ),
-                                          ],
-                                        ),
-                                      )
-                                    : Container();
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              return Container();
+                            }
                           },
                         ),
                       ),

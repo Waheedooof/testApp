@@ -17,32 +17,32 @@ class AuthPage extends StatelessWidget {
       ),
       body: GetBuilder<AuthController>(builder: (authController) {
         return Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AppTextField(
-              type: tr('password'),
-              iconData: Icons.password,
-              inputType: TextInputType.visiblePassword,
-              onChanged: (p0) {},
-              validator: (p0) {
-                return null;
-              },
-              auto: true,
-              obscureText: authController.showText,
-              onTap: () {
-                authController.changeShowText();
-              },
-              textFieldController: authController.password,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            HandelingRequest(
-              statusRequest: authController.statusRequest!,
-              widget: ElevatedButton(
+            child: HandelingRequest(
+          statusRequest: authController.statusRequest!,
+          widget: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AppTextField(
+                type: tr('password'),
+                iconData: Icons.password,
+                inputType: TextInputType.visiblePassword,
+                onChanged: (p0) {},
+                validator: (p0) {
+                  return null;
+                },
+                auto: true,
+                obscureText: authController.showText,
+                onTap: () {
+                  authController.changeShowText();
+                },
+                textFieldController: authController.passwordTextController,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
                 onPressed: () async {
-                  await authController.auth();
+                  await authController.login();
                 },
                 child: Container(
                   margin:
@@ -50,8 +50,8 @@ class AuthPage extends StatelessWidget {
                   child: const Text('ok').tr(),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ));
       }),
     );

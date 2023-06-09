@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:get/get.dart';
 import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:test_maker/controller/home_controllers/files_contoller.dart';
@@ -51,11 +50,6 @@ class ExamController extends GetxController {
         });
       }
     }
-    // if(historyListAnswers.isNotEmpty&&historyListAnswers.c) {
-    //   if (historyListAnswers[questionColumnIndex].containsValue(columnIndexRow)) {
-    //     return true;
-    //   }
-    // }
     return value;
   }
 
@@ -108,19 +102,6 @@ class ExamController extends GetxController {
     return false;
   }
 
-  // bool isChooseOneAnswer(int indexInColumn, int indexInRow) {
-  //   if (choose1.isNotEmpty) {
-  //     if (choose1.keys.first == indexInColumn &&
-  //         choose1.values.first == indexInRow) {
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //   } else {
-  //     return false;
-  //   }
-  // }
-
   void reset() {
     answers = [];
     historyListAnswers = {};
@@ -133,17 +114,6 @@ class ExamController extends GetxController {
     filesController.getListFiles();
     excelFileController.refreshList();
   }
-
-  // void chooseOneAnswerIndex(int questionColumnIndex, int indexInRow) {
-  //   ExcelFileController excelController = Get.find();
-  //   choose1 = {};
-  //   choose1.assign(questionColumnIndex, indexInRow);
-  //   print(choose1);
-  //   answerIsTrue = excelController.csvTable[questionColumnIndex][6]
-  //       .toString()
-  //       .contains(indexInRow.toString());
-  //   update();
-  // }
 
   void chooseAnswerIndex(int questionColumnIndex, int indexInRow) {
     if (choose1.containsKey(questionColumnIndex)) {
@@ -184,18 +154,14 @@ class ExamController extends GetxController {
     if (excelController.csvTable[questionColumnIndex][6].toString().length ==
         choose1.values.first.toString().split('').length) {
       value = true;
-      //12
       choose1.values.first.toString().split('').forEach(
         (char) {
           if (value) {
-            //123// true
             if (excelController.csvTable[questionColumnIndex][6]
                 .toString()
                 .contains(char)) {
               value = true;
             } else {
-              // print('==flase==');
-
               value = false;
             }
           }

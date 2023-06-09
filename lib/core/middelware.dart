@@ -13,8 +13,17 @@ class MiddleWare extends GetMiddleware {
     if (!_myServices.sharedPreferences.containsKey('lang')) {
       // return RouteSettings(name: AppRoute.homePage);
       return RouteSettings(name: AppRoute.chooseLang);
-    } else if (!_myServices.sharedPreferences.containsKey('auth')) {
+    } else if (!_myServices.sharedPreferences.containsKey('password')) {
       return RouteSettings(name: AppRoute.authPage);
-    } else {}
+    } else {
+      if (_myServices.sharedPreferences.containsKey('password')) {
+        if (DateTime.now().year -
+            int.parse(
+                _myServices.sharedPreferences.getString('password')!) >
+            2) {
+          return RouteSettings(name: AppRoute.authPage);
+        }
+      }
+    }
   }
 }

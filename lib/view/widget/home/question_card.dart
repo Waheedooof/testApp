@@ -178,9 +178,9 @@ class QuestionCard extends StatelessWidget {
         excelController.csvTable[questionColumnIndex].length,
         growable: false,
         (indexInRow) {
-          List notAnswers = [0, 5, 6, 7];
+          List answers = [1, 2, 3, 4];
 
-          if (notAnswers.contains(indexInRow) ||
+          if (!answers.contains(indexInRow) ||
               excelController.csvTable[questionColumnIndex][indexInRow]
                       .toString() ==
                   '') {

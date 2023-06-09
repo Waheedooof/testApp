@@ -8,32 +8,55 @@ import 'package:test_maker/core/constant/approutes.dart';
 import 'package:test_maker/core/services/services.dart';
 
 import '../core/class/statusrequest.dart';
+import '../core/function/checkinternet.dart';
+import '../data/datasource/remote/home/login.dart';
 
 class AuthController extends GetxController {
   bool showText = true;
 
-  TextEditingController password = TextEditingController();
+  TextEditingController passwordTextController = TextEditingController();
 
   late GlobalKey<FormState> formState = GlobalKey<FormState>();
   StatusRequest? statusRequest = StatusRequest.none;
+  final LoginData loginData = LoginData(Get.find());
 
   // final LoginData loginData = LoginData(Get.find());
   MyServices myServices = Get.find();
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
   }
 
-  auth() async {
-    statusRequest = StatusRequest.loading;
-    update();
-    Timer(const Duration(seconds: 2), () {
-      statusRequest = StatusRequest.success;
+  login() async {
+    if (await checkInternet()) {
+      statusRequest = StatusRequest.loading;
       update();
-      myServices.sharedPreferences.setString('auth', 'password');
-      Get.offNamed(AppRoute.homePage);
-    });
+
+      try {
+        var response = await loginData.loginTeacher(
+          teacherCode: passwordTextController.text,
+        );
+        print('===========login===${response}======');
+        if (response['status'] == 'success') {
+          statusRequest = StatusRequest.success;
+       await myServices.sharedPreferences.setString('password',DateTime.now().year.toString());
+          Get.offNamed(AppRoute.homePage);
+        } else {
+          statusRequest = StatusRequest.failure;
+        }
+      } catch (e) {
+        print('===========login catch=========');
+        statusRequest = StatusRequest.failure;
+      }
+
+      print(statusRequest);
+    } else {
+      statusRequest = StatusRequest.serverExp;
+    }
+
+    update();
+
   }
 
   changeShowText() {
@@ -42,7 +65,7 @@ class AuthController extends GetxController {
   }
 
   Future<void> logout() async {
-    await myServices.sharedPreferences.remove('auth');
+    await myServices.sharedPreferences.remove('password');
     await myServices.sharedPreferences.remove('tablePath');
     ExamController().reset();
     Get.offNamed(AppRoute.authPage);

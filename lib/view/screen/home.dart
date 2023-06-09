@@ -19,27 +19,6 @@ class HomePage extends StatelessWidget {
 
   ExcelFileController excelFileController = Get.find();
 
-  // listq(HomeController homeController) {
-  //   return SliverList(
-  //     delegate: SliverChildBuilderDelegate(
-  //       (context, index) {
-  //         return SizedBox(
-  //           height: Get.height / 1.1,
-  //           child: PageView.builder(
-  //             scrollDirection: Axis.vertical,
-  //             itemCount: excelFileController.csvTable.length,
-  //             itemBuilder: (context, index) => QuestionCard(
-  //               questionColumnIndex: homeController.isReverseList.value
-  //                   ? excelFileController.csvTable.length - 1 - index
-  //                   : index,
-  //             ),
-  //           ),
-  //         );
-  //       },
-  //       childCount: 1,
-  //     ),
-  //   );
-  // }
 
   list(HomeController homeController) {
     return SliverList(
@@ -227,14 +206,14 @@ class HomePage extends StatelessWidget {
         if (excelFileController.searchQuestionsMode) {
           excelFileController.changeSearchQuestions();
         } else {
-          Get.toNamed(AppRoute.addPage);
+          Get.toNamed(AppRoute.addQuesPage);
         }
       } else if (details.primaryVelocity! < 0 &&
           Get.locale?.languageCode == 'en') {
         if (excelFileController.searchQuestionsMode) {
           excelFileController.changeSearchQuestions();
         } else {
-          Get.toNamed(AppRoute.addPage);
+          Get.toNamed(AppRoute.addQuesPage);
         }
       } else if (details.primaryVelocity! < 0 &&
               Get.locale?.languageCode == 'ar' ||
