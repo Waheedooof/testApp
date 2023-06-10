@@ -8,9 +8,7 @@ import 'package:test_maker/controller/home_controllers/exam_cont.dart';
 import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:get/get.dart';
 import 'package:test_maker/controller/home_controllers/home_page_cont.dart';
-import 'package:test_maker/core/constant/approutes.dart';
 import 'package:test_maker/view/widget/home/question_card.dart';
-import '../widget/custom_card.dart';
 import '../widget/drawer.dart';
 import '../widget/home/title_widget.dart';
 

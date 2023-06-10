@@ -280,6 +280,7 @@ class QuestionCard extends StatelessWidget {
   }
 
   deleteSnackBar() {
+
     return Get.showSnackbar(
       GetSnackBar(
         duration: const Duration(seconds: 2),

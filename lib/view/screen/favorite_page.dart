@@ -15,18 +15,22 @@ class FavoritePage extends StatelessWidget {
     return GetBuilder<ExcelFileController>(
       builder: (controller) {
         List favorites = [];
-        for (List list in excelFileController.csvTable) {
-          if (list.length == 8) {
-            favorites.add(list);
+
+        for (List element in excelFileController.csvTable) {
+          if(element.toString().contains('like')){
+            favorites.add(element);
+
           }
         }
+
+
 
         return favorites.isNotEmpty
             ? ListView.separated(
                 itemCount: excelFileController.csvTable.length,
                 primary: false,
                 itemBuilder: (BuildContext context, int index) {
-                  if (excelFileController.csvTable[index].length == 8) {
+                  if (excelFileController.csvTable[index].toString().contains('like')) {
                     return GetBuilder<ExamController>(builder: (controller) {
                       return QuestionCard(
                         questionColumnIndex: index,
