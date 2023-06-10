@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
+import 'package:test_maker/core/class/handelingview.dart';
 
 import '../widget/appbar.dart';
+import 'imagePage.dart';
 
 class AddPage extends StatelessWidget {
   AddPage({Key? key}) : super(key: key);
@@ -49,7 +53,7 @@ class AddPage extends StatelessWidget {
       controller: index == 0 ? excelFileController.textQuesController : null,
       autofocus: true,
       textInputAction: TextInputAction.next,
-      enabled: true,
+      // enabled: true,
       maxLines: index == 0 ? 3 : 1,
       decoration: BoxDecoration(
         border: Border.all(
@@ -124,19 +128,48 @@ class AddPage extends StatelessWidget {
     );
   }
 
+  imageWidget() {
+    if (excelFileController.questionAddRow.last != '' &&
+        excelFileController.questionAddRow.length == 8) {
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 20),
+        width: Get.width / 2,
+        height: Get.width / 2,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: FileImage(
+              File(
+                excelFileController.questionAddRow[
+                        excelFileController.questionAddRow.length - 1]
+                    .replaceAll('path:', '')
+                    .replaceAll(']', ''),
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
+
   floatingActionButton() {
     return FloatingActionButton(
       heroTag: 'add_hero',
       onPressed: () {
         excelFileController.writeQuesData();
       },
-      child: const Icon(Icons.done),
+      child: GetBuilder<ExcelFileController>(builder: (controller) {
+        return HandelingView(
+          statusRequest: controller.statusRequest,
+          widget: const Icon(Icons.done),
+        );
+      }),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
       onHorizontalDragEnd: (DragEndDetails details) {
         if (details.primaryVelocity! > 100) {
@@ -146,7 +179,16 @@ class AddPage extends StatelessWidget {
       child: Scaffold(
         body: AppCustomAppBar(
           title: const Text('type_q').tr(),
-          actions: const [],
+          actions: [
+            IconButton(
+                onPressed: () {
+                  excelFileController.addImagePath();
+                },
+                icon: Icon(
+                  Icons.image,
+                  color: Get.theme.primaryColor,
+                ))
+          ],
           body: Center(
             child: GetBuilder<ExcelFileController>(
               builder: (excelFileController) {
@@ -159,53 +201,59 @@ class AddPage extends StatelessWidget {
                     ),
                     child: SingleChildScrollView(
                       child: Column(
-                        children: List.generate(
-                          8,
-                          (index) {
-                            int lengthOfChooses = excelFileController
-                                .questionAddRow
-                                .getRange(1, 5)
-                                .where((element) => element != '')
-                                .length;
+                        children: [
+                          imageWidget(),
+                          Column(
+                            children: List.generate(
+                              8,
+                              (index) {
+                                int lengthOfChooses = excelFileController
+                                    .questionAddRow
+                                    .getRange(1, 5)
+                                    .where((element) => element != '')
+                                    .length;
 
-                            if (index == 7) {
-                              return Container(
-                                color: Get.theme.scaffoldBackgroundColor,
-                                height: Get.height / 12,
-                              );
-                            } else if (index == 0 ||
-                                index == 6 ||
-                                excelFileController
-                                    .questionAddRow[index - 1].isNotEmpty) {
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
+                                if (index == 7) {
+                                  return Container(
+                                    color: Get.theme.scaffoldBackgroundColor,
+                                    height: Get.height / 12,
+                                  );
+                                } else if (index == 0 ||
+                                    index == 6 ||
+                                    excelFileController
+                                        .questionAddRow[index - 1].isNotEmpty) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        labelWidget(index),
-                                        copyPastButton(index)
+                                        Column(
+                                          children: [
+                                            labelWidget(index),
+                                            copyPastButton(index)
+                                          ],
+                                        ),
+                                        Expanded(
+                                          child: index == 6
+                                              ? chooseAnswerIndexWidget(
+                                                  lengthOfChooses,
+                                                )
+                                              : textFieldWidget(
+                                                  index,
+                                                  context,
+                                                ),
+                                        ),
                                       ],
                                     ),
-                                    Expanded(
-                                      child: index == 6
-                                          ? chooseAnswerIndexWidget(
-                                              lengthOfChooses,
-                                            )
-                                          : textFieldWidget(
-                                              index,
-                                              context,
-                                            ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } else {
-                              return Container();
-                            }
-                          },
-                        ),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

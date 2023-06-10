@@ -72,7 +72,7 @@ class HomePage extends StatelessWidget {
   writeQuestionWidget() {
     return ElevatedButton(
       onPressed: () async {
-        excelFileController.toAddScreen();
+        excelFileController.toAddQuesScreen();
       },
       child: ListTile(
         trailing: const Icon(Icons.add),
@@ -206,14 +206,14 @@ class HomePage extends StatelessWidget {
         if (excelFileController.searchQuestionsMode) {
           excelFileController.changeSearchQuestions();
         } else {
-          Get.toNamed(AppRoute.addQuesPage);
+          excelFileController.toAddQuesScreen();
         }
       } else if (details.primaryVelocity! < 0 &&
           Get.locale?.languageCode == 'en') {
         if (excelFileController.searchQuestionsMode) {
           excelFileController.changeSearchQuestions();
         } else {
-          Get.toNamed(AppRoute.addQuesPage);
+          excelFileController.toAddQuesScreen();
         }
       } else if (details.primaryVelocity! < 0 &&
               Get.locale?.languageCode == 'ar' ||

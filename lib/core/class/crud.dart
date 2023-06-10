@@ -7,7 +7,6 @@ import 'package:path/path.dart';
 import 'package:test_maker/core/class/statusrequest.dart';
 import '../function/checkinternet.dart';
 
-
 class Crud {
   Future<Either<StatusRequest, Map>> postData(String urlLink, Map data) async {
     try {
@@ -30,17 +29,18 @@ class Crud {
     }
   }
 
-  Future<Either<StatusRequest, Map>> postDataWithImage(String urlLink, Map data,
-      File file) async {
+  Future<Either<StatusRequest, String>> postDataWithImage(
+    String urlLink,
+    Map data,
+    File file,
+  ) async {
     try {
-      print(data);
-      print(file);
       if (await checkInternet()) {
         var request = http.MultipartRequest('POST', Uri.parse(urlLink));
         var length = await file.length();
         var stream = http.ByteStream(file.openRead());
-        var multiparFile = http.MultipartFile(
-            'file', stream, length, filename: basename(file.path));
+        var multiparFile = http.MultipartFile('file', stream, length,
+            filename: basename(file.path));
         request.files.add(multiparFile);
         data.forEach((key, value) {
           request.fields[key] = value;
@@ -51,11 +51,8 @@ class Crud {
         var response = await http.Response.fromStream(myreq);
 
         if (response.statusCode == 200 || response.statusCode == 201) {
-          Map responceBody = jsonDecode(response.body);
-          print('==========responceBody.length================');
-          print(responceBody.length);
-          print('==========Crud================');
-          return Right(responceBody);
+          // Map responceBody = jsonDecode(response.body);
+          return Right(response.body);
         } else {
           return const Left(StatusRequest.failure);
         }

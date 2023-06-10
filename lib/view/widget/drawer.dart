@@ -64,7 +64,7 @@ class DrawerWidget extends StatelessWidget {
             children: [
               actionButton(
                 click: () async {
-                  excelFileController.toAddScreen();
+                  excelFileController.toAddQuesScreen();
                 },
                 title:
                     Text(tr('type_q'), style: context.textTheme.bodyText1).tr(),

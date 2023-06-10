@@ -22,13 +22,12 @@ class HandelingView extends StatelessWidget {
           ),
         ),
       );
-    } else if (statusRequest == StatusRequest.success) {
-      return widget;
-    } else if (statusRequest == StatusRequest.failure) {
-      return const Text('no data');
+    // } else if (statusRequest == StatusRequest.success) {
+    //   return widget;
+    // } else if (statusRequest == StatusRequest.failure) {
+    //   return const Text('no data');
     } else {
-      return const Text('Error');
-    }
+      return widget;    }
   }
 }
 

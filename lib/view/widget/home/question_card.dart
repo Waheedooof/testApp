@@ -1,12 +1,18 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_connect/http/src/_http/_io/_file_decoder_io.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:test_maker/controller/home_controllers/exam_cont.dart';
 import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:get/get.dart';
 import 'package:test_maker/controller/question_controllers/question_controller.dart';
 import 'package:test_maker/core/constant/approutes.dart';
+import 'package:test_maker/view/screen/imagePage.dart';
+import 'package:test_maker/view/widget/appcachiamge.dart';
 
 import '../../../core/constant/app_color.dart';
 import '../../../core/theme/app_dimentions.dart';
@@ -73,7 +79,7 @@ class QuestionCard extends StatelessWidget {
       onLongPress: () {
         Get.toNamed(AppRoute.favoritePage);
       },
-      child: excelController.csvTable[questionColumnIndex].length == 8
+      child: excelController.csvTable[questionColumnIndex].contains('like')
           ? const Padding(
               padding: EdgeInsets.all(3.0),
               child: Icon(
@@ -131,7 +137,8 @@ class QuestionCard extends StatelessWidget {
           child: Center(
             child: Row(
               children: [
-                questionIndex(),
+                // questionIndex(),
+                imageWidget(),
                 questionLabel(),
               ],
             ),
@@ -228,7 +235,9 @@ class QuestionCard extends StatelessWidget {
             Radius.circular(AppDims.corners),
           ),
         ),
-        color: excelController.readMode?getCorrectAnswersColor(indexInRow): getAnswersColor(indexInRow),
+        color: excelController.readMode
+            ? getCorrectAnswersColor(indexInRow)
+            : getAnswersColor(indexInRow),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
           child: Text(
@@ -294,6 +303,60 @@ class QuestionCard extends StatelessWidget {
     );
   }
 
+  imageWidget() {
+    if (!excelController.containPath(questionColumnIndex)) {
+      return questionIndex();
+    } else {
+      return InkWell(
+        onTap: () {
+          Get.to(() => ImageViewer(
+                imagePath: excelController.getCsvTablePath(questionColumnIndex),
+              ));
+        },
+        child: SizedBox(
+          width: Get.width / 15,
+          height: Get.width / 15,
+          child: AppCachImage(
+              imageUrl: excelController.getCsvTablePath(questionColumnIndex)),
+          // decoration: BoxDecoration(
+          //   borderRadius: const BorderRadius.all(Radius.circular(20)),
+          //   image: DecorationImage(
+          //     image: FileImage(
+          //       File(excelController.getCsvTablePath(questionColumnIndex)),
+          //     ),
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
+        ),
+      );
+    }
+  }
+
+  Widget questionIndex() {
+    return InkWell(
+      onTap: () async {
+        await Get.toNamed(
+          AppRoute.questionData,
+          arguments: excelController.csvTable[questionColumnIndex],
+        );
+        examController.reset();
+      },
+      child: SizedBox(
+        width: Get.width / 18,
+        child: CircleAvatar(
+          foregroundColor: Get.theme.scaffoldBackgroundColor,
+          backgroundColor: Get.theme.primaryColor.withOpacity(0.7),
+          child: Center(
+            child: Text(
+              (questionColumnIndex + 1).toString(),
+              style: const TextStyle(fontSize: 10),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   infoSnackBar() {
     String value = excelController.csvTable[questionColumnIndex][5].toString();
     return Get.showSnackbar(
@@ -329,33 +392,9 @@ class QuestionCard extends StatelessWidget {
     );
   }
 
-  Widget questionIndex() {
-    return InkWell(
-      onTap: () async {
-        await Get.toNamed(
-          AppRoute.questionData,
-          arguments: excelController.csvTable[questionColumnIndex],
-        );
-        examController.reset();
-      },
-      child: SizedBox(
-        width: Get.width / 18,
-        child: CircleAvatar(
-          foregroundColor: Get.theme.scaffoldBackgroundColor,
-          backgroundColor: Get.theme.primaryColor.withOpacity(0.7),
-          child: Center(
-            child: Text(
-              (questionColumnIndex + 1).toString(),
-              style: const TextStyle(fontSize: 10),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    // getPath();
     return InkWell(
       onLongPress: () {
         deleteSnackBar();

@@ -11,10 +11,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:test_maker/controller/home_controllers/exam_cont.dart';
 import 'package:test_maker/controller/home_controllers/files_contoller.dart';
+import 'package:test_maker/core/class/question.dart';
 import 'package:test_maker/core/constant/file.dart';
+import 'package:test_maker/core/function/checkinternet.dart';
 import 'package:test_maker/core/services/services.dart';
+import 'package:test_maker/data/datasource/remote/home/image.dart';
+import 'package:test_maker/links.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/class/statusrequest.dart';
 import '../../core/constant/approutes.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../core/function/handlingdata.dart';
 
 class ExcelFileController extends GetxController {
   List<List<dynamic>> csvTable = [];
@@ -29,6 +37,58 @@ class ExcelFileController extends GetxController {
   TextEditingController textQuesController = TextEditingController();
   bool readMode = false;
   MyServices myServices = Get.find();
+  final UploadData uploadData = UploadData(Get.find());
+  StatusRequest statusRequest = StatusRequest.none;
+
+  @override
+  void onInit() {
+    if (_myServices.sharedPreferences.containsKey('tablePath')) {
+      getFileData(getSavedPath());
+    }
+    super.onInit();
+  }
+
+  bool isUploaded = true;
+
+  String getUrl(String response) {
+    for (var element in response.split("\"")) {
+      if (element.contains('https')) {
+        return element;
+      }
+    }
+    return '';
+  }
+
+
+  Future<String> uploadImage(File file) async {
+    isUploaded = false;
+    print(file.path);
+    if (file.path.isNotEmpty) {
+      if (await checkInternet()) {
+        statusRequest = StatusRequest.loading;
+        update();
+        var response =
+            await uploadData.uploadImageData(teacherCode: '1', file: file);
+        statusRequest = handlingData(response);
+        if (statusRequest == StatusRequest.success) {
+          if (response.toString().contains(AppLinks.serverLink)) {
+            isUploaded = true;
+            return await getUrl(response.toString());
+          }
+        } else {
+          statusRequest = StatusRequest.serverExp;
+        }
+      } else {
+        statusRequest = StatusRequest.failure;
+      }
+    } else {
+      isUploaded = true;
+    }
+
+    statusRequest = StatusRequest.success;
+    update();
+    return '';
+  }
 
   changeReadMode() {
     readMode = !readMode;
@@ -44,14 +104,6 @@ class ExcelFileController extends GetxController {
 
   endDrawer(BuildContext context) {
     scaffoldKey.currentState!.closeDrawer();
-  }
-
-  @override
-  void onInit() {
-    if (_myServices.sharedPreferences.containsKey('tablePath')) {
-      getFileData(getSavedPath());
-    }
-    super.onInit();
   }
 
   Future createFile(fileName) async {
@@ -157,9 +209,9 @@ class ExcelFileController extends GetxController {
         allowedExtensions: ['csv'],
         // initialDirectory: '/data/user/0//',
       ))!;
-    await  _myServices.sharedPreferences
+      await _myServices.sharedPreferences
           .setString('tablePath', result.files.first.path!);
-     await getFileData(result.files.first.path!);
+      await getFileData(result.files.first.path!);
       print('=========directory================');
       print(result.files.first.path!);
       result = null;
@@ -196,6 +248,7 @@ class ExcelFileController extends GetxController {
     required int editRowIndex,
   }) async {
     String filePath = getSavedPath();
+    print(csvTable[editRowIndex].length);
     print(csvTable[editRowIndex]);
 
     if (!csvTable[editRowIndex].contains('like')) {
@@ -204,7 +257,7 @@ class ExcelFileController extends GetxController {
       csvTable[editRowIndex].remove('like');
     }
 
-    print('===========');
+    print(csvTable[editRowIndex].length);
     print(csvTable[editRowIndex]);
     String csvData = const ListToCsvConverter().convert(csvTable);
     final path = filePath;
@@ -215,6 +268,24 @@ class ExcelFileController extends GetxController {
     );
     getFileData(filePath);
     print('${filePath}edit');
+  }
+
+  String getCsvTablePath(questionColumnIndex) {
+    for (var element in csvTable[questionColumnIndex]) {
+      if (element.toString().contains('http')) {
+        print(element.toString());
+        return element.toString();
+      }
+    }
+    return '';
+  }
+
+  bool containPath(questionColumnIndex) {
+    if (csvTable[questionColumnIndex].toString().contains('http')) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future editQuestionDataFile({
@@ -236,7 +307,8 @@ class ExcelFileController extends GetxController {
     print('${filePath}edit');
   }
 
-  void toAddScreen() {
+  void toAddQuesScreen() {
+    reset();
     Get.toNamed(AppRoute.addQuesPage);
   }
 
@@ -245,41 +317,51 @@ class ExcelFileController extends GetxController {
   }
 
   void writeQuesData() async {
-    if (_myServices.sharedPreferences.containsKey('tablePath')) {
-      if (questionAddRow.first.isEmpty ||
-          questionAddRow[2].isEmpty ||
-          questionAddRow[1].isEmpty ||
-          questionAddRow[6].isEmpty) {
-        Get.showSnackbar(
-          GetSnackBar(
-            messageText: Text(
-              tr('empty'),
-              style: TextStyle(
-                color: Get.theme.scaffoldBackgroundColor,
-              ),
-            ),
-            backgroundColor: Get.theme.primaryColor,
-            duration: const Duration(seconds: 1),
-          ),
-        );
-      } else {
-        await writeToFile(newData: [questionAddRow]);
-        questionAddRow = ['', '', '', '', '', '', ''];
-        ExamController examController = Get.find();
-        examController.reset();
-        questionAddRow = ['', '', '', '', '', '', ''];
-        correctAnswer = 0;
-        textQuesController.text = '';
-        update();
-        Get.back();
-        await showEditAbleSnackBar();
+    isUploaded = true;
+    if (questionAddRow.toString().contains('path:')) {
+      questionAddRow[questionAddRow.length - 1]=    await uploadImage(
+        File(
+          questionAddRow[questionAddRow.length - 1]
+              .replaceAll('path:', '')
+              .replaceAll(']', ''),
+        ),
+      );
+    }
 
-        await Get.toNamed(AppRoute.addQuesPage);
+    if (isUploaded) {
+      if (_myServices.sharedPreferences.containsKey('tablePath')) {
+        if (questionAddRow[Question.question].isEmpty ||
+            questionAddRow[Question.a1].isEmpty ||
+            questionAddRow[Question.a2].isEmpty ||
+            questionAddRow[Question.correct].isEmpty) {
+          Get.showSnackbar(
+            GetSnackBar(
+              messageText: Text(
+                tr('empty'),
+                style: TextStyle(
+                  color: Get.theme.scaffoldBackgroundColor,
+                ),
+              ),
+              backgroundColor: Get.theme.primaryColor,
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        } else {
+          await writeToFile(newData: [questionAddRow]);
+          ExamController examController = Get.find();
+          examController.reset();
+          reset();
+          update();
+          Get.back();
+          await showEditAbleSnackBar();
+
+          await Get.toNamed(AppRoute.addQuesPage);
+        }
+      } else {
+        Get.toNamed(AppRoute.writeFilePage)?.whenComplete(() {
+          Get.toNamed(AppRoute.addQuesPage);
+        });
       }
-    } else {
-      Get.toNamed(AppRoute.writeFilePage)?.whenComplete(() {
-        Get.toNamed(AppRoute.addQuesPage);
-      });
     }
   }
 
@@ -298,16 +380,16 @@ class ExcelFileController extends GetxController {
     } else {
       correctAnswer = int.parse(correctAnswer.toString() + value.toString());
     }
-    questionAddRow[6] = correctAnswer.toString();
+    questionAddRow[Question.correct] = correctAnswer.toString();
 
     update();
-    print(questionAddRow[6]);
+    print(questionAddRow[Question.correct]);
     print(correctAnswer);
   }
 
   void setCorrectOneAnswer(int value) {
     correctAnswer = value;
-    questionAddRow[6] = correctAnswer.toString();
+    questionAddRow[Question.correct] = correctAnswer.toString();
     update();
   }
 
@@ -366,6 +448,18 @@ class ExcelFileController extends GetxController {
     }
   }
 
+  Future<void> addImagePath() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      print(questionAddRow);
+      questionAddRow.add('path:${pickedImage.path}');
+      update();
+      print(questionAddRow);
+    }
+  }
+
   void setRowValue(int index, String value) {
     questionAddRow[index] = (value);
     print(questionAddRow);
@@ -399,6 +493,14 @@ class ExcelFileController extends GetxController {
       textQuesController.text = data.text ?? '';
     }
     setRowValue(0, textQuesController.text);
+    update();
+  }
+
+  void reset() {
+    questionAddRow = ['', '', '', '', '', '', ''];
+    correctAnswer = 0;
+    statusRequest = StatusRequest.success;
+    textQuesController.text = '';
     update();
   }
 }

@@ -54,6 +54,7 @@
   "mark": "Mark",
   "changeList": "Reverse the list",
   "start": "Start timer",
+  "image_view": "Image Viewer",
   "stop": "Stop timer",
   "cancel": "Cancel timer",
   "resume": "Resume timer",
