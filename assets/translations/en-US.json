@@ -22,6 +22,7 @@
   "read": "Read New File",
   "password": "Password",
   "cut": "Cut",
+  "crop_image": "Crop Image",
   "paste": "Paste",
   "logout": "Logout",
   "write": "Write File",
@@ -69,7 +70,7 @@
   "network_error": "NetWork Error",
   "auth_error": "Code Error",
   "themeLight": "Light Mode",
-  "NotEditAble": "Your Edit On This File Will Not Applied When You Share It",
+  "NotEditAble": "Create your own file to be able to Edit",
   "EditAble": "Your Edit will be applied to this file When You Share It",
   "show_answers": "Show Correct Answers",
   "hide_answers": "Hide Correct Answers"

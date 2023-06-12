@@ -41,6 +41,7 @@ class AuthController extends GetxController {
         if (response['status'] == 'success') {
           statusRequest = StatusRequest.success;
        await myServices.sharedPreferences.setString('password',DateTime.now().year.toString());
+       await myServices.sharedPreferences.setString('teacherCode',passwordTextController.text);
           Get.offNamed(AppRoute.homePage);
         } else {
           statusRequest = StatusRequest.failure;

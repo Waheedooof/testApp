@@ -57,8 +57,8 @@ class HandelingRequest extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('network_error',
-                    style: TextStyle(color: Get.theme.primaryColor))
+            child: const Text('network_error',
+                    style: TextStyle(color: Colors.red))
                 .tr(),
           ),
           widget
@@ -69,8 +69,8 @@ class HandelingRequest extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('auth_error',
-                    style: TextStyle(color: Get.theme.primaryColor))
+            child: const Text('auth_error',
+                    style: TextStyle(color: Colors.red))
                 .tr(),
           ),
           widget

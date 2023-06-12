@@ -5,8 +5,6 @@ import 'package:test_maker/core/services/services.dart';
 
 import '../core/theme/themes.dart';
 
-
-
 class ThemeController extends GetxController with SingleGetTickerProviderMixin {
   MyServices myServices = Get.find();
   late AnimationController controller;
@@ -78,6 +76,7 @@ class ThemeController extends GetxController with SingleGetTickerProviderMixin {
       );
       // Get.changeThemeMode(ThemeMode.dark);
     }
+
     toggleAnimation();
     // update();
   }

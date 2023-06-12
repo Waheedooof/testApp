@@ -17,7 +17,6 @@ class HomePage extends StatelessWidget {
 
   ExcelFileController excelFileController = Get.find();
 
-
   list(HomeController homeController) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
@@ -99,7 +98,7 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 20),
               readFileWidget(),
               SizedBox(
-                height: Get.height/4,
+                height: Get.height / 4,
                 child: Center(
                   child: Text(
                     'no_data',
@@ -140,7 +139,7 @@ class HomePage extends StatelessWidget {
 
   appBar(context) {
     return SliverAppBar(
-      backgroundColor: Get.theme.scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       snap: false,
       floating: false,
       stretch: true,
@@ -156,8 +155,8 @@ class HomePage extends StatelessWidget {
           excelFileController.displayDrawer(context);
         },
       ),
-      expandedHeight: Get.height / 7,
-      toolbarHeight: Get.height / 17,
+      expandedHeight: MediaQuery.of(context).size.height / 7,
+      toolbarHeight: MediaQuery.of(context).size.height / 17,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Get.theme.scaffoldBackgroundColor,
         statusBarIconBrightness: Get.theme.brightness,

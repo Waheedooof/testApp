@@ -5,13 +5,17 @@
     android:versionName="TEST">
 
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.INTERNET"/> <!-- Add this -->
 
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:label="TestApp"
         android:requestLegacyExternalStorage="true">
-
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity
             android:name="com.example.test_maker.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

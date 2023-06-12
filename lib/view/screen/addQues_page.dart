@@ -9,7 +9,6 @@ import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:test_maker/core/class/handelingview.dart';
 
 import '../widget/appbar.dart';
-import 'imagePage.dart';
 
 class AddPage extends StatelessWidget {
   AddPage({Key? key}) : super(key: key);
@@ -181,13 +180,14 @@ class AddPage extends StatelessWidget {
           title: const Text('type_q').tr(),
           actions: [
             IconButton(
-                onPressed: () {
-                  excelFileController.addImagePath();
-                },
-                icon: Icon(
-                  Icons.image,
-                  color: Get.theme.primaryColor,
-                ))
+              onPressed: () {
+                excelFileController.addImagePath();
+              },
+              icon: Icon(
+                Icons.image,
+                color: Get.theme.primaryColor,
+              ),
+            ),
           ],
           body: Center(
             child: GetBuilder<ExcelFileController>(

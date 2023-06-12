@@ -10,6 +10,7 @@ import 'package:test_maker/controller/home_controllers/exam_cont.dart';
 import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:get/get.dart';
 import 'package:test_maker/controller/question_controllers/question_controller.dart';
+import 'package:test_maker/core/class/handelingview.dart';
 import 'package:test_maker/core/constant/approutes.dart';
 import 'package:test_maker/view/screen/imagePage.dart';
 import 'package:test_maker/view/widget/appcachiamge.dart';
@@ -132,49 +133,56 @@ class QuestionCard extends StatelessWidget {
             Radius.circular(AppDims.corners),
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          child: Center(
-            child: Row(
-              children: [
-                // questionIndex(),
-                imageWidget(),
-                questionLabel(),
-              ],
-            ),
-          ),
-        ),
+        child: questionLabel(),
       ),
     );
   }
 
   questionLabel() {
-    return Expanded(
-      child: InkWell(
-        onTap: () async {
-          await Get.toNamed(
-            AppRoute.questionData,
-            arguments: excelController.csvTable[questionColumnIndex],
-          );
-          examController.reset();
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8.0,
-            horizontal: 10,
+    return InkWell(
+      onTap: () async {
+        !excelController.isFileEditAble()
+            ? null
+            : await Get.toNamed(
+                AppRoute.questionData,
+                arguments: excelController.csvTable[questionColumnIndex],
+              )?.whenComplete(() {
+                examController.reset();
+              });
+      },
+      child: Column(
+        children: [
+          Center(
+            child: imageWidget(),
           ),
-          child: Text(
-            excelController.csvTable[questionColumnIndex][0].toString(),
-            textAlign: Get.locale?.languageCode == 'en'
-                ? TextAlign.left
-                : TextAlign.right,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Get.theme.highlightColor,
-              fontSize: 13,
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 10,
+            ),
+            child: Row(
+              children: [
+                questionIndex(),
+                const SizedBox(
+                  width: 8,
+                ),
+                Expanded(
+                  child: Text(
+                    excelController.csvTable[questionColumnIndex][0].toString(),
+                    textAlign: Get.locale?.languageCode == 'en'
+                        ? TextAlign.left
+                        : TextAlign.right,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Get.theme.highlightColor,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -280,7 +288,6 @@ class QuestionCard extends StatelessWidget {
   }
 
   deleteSnackBar() {
-
     return Get.showSnackbar(
       GetSnackBar(
         duration: const Duration(seconds: 2),
@@ -306,27 +313,68 @@ class QuestionCard extends StatelessWidget {
 
   imageWidget() {
     if (!excelController.containPath(questionColumnIndex)) {
-      return questionIndex();
+      return Container();
     } else {
-      return InkWell(
-        onTap: () {
-          Get.to(() => ImageViewer(
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 11.0),
+        child: InkWell(
+          onTap: () {
+            Get.to(
+              () => ImageViewer(
                 imagePath: excelController.getCsvTablePath(questionColumnIndex),
-              ));
-        },
-        child: SizedBox(
-          width: Get.width / 15,
-          height: Get.width / 15,
-          child: AppCachImage(
-              imageUrl: excelController.getCsvTablePath(questionColumnIndex)),
-          // decoration: BoxDecoration(
-          //   borderRadius: const BorderRadius.all(Radius.circular(20)),
-          //   image: DecorationImage(
-          //     image: FileImage(
-          //       File(excelController.getCsvTablePath(questionColumnIndex)),
-          //     ),
-          //     fit: BoxFit.cover,
-          //   ),
+              ),
+            );
+          },
+          child: Container(
+            width: Get.width,
+            height: Get.width / 2,
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Get.theme.primaryColor.withOpacity(0.3),
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+              borderRadius: BorderRadius.all(
+                Radius.circular(AppDims.corners),
+              ),
+            ),
+            child: GetBuilder<ExcelFileController>(builder: (controller) {
+              return HandelingView(
+                statusRequest: controller.statusRequest,
+                widget: ClipRRect(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(AppDims.corners),
+                  ),
+                  child: PhotoView(
+                    initialScale: PhotoViewComputedScale.contained,
+                    customSize: Size(
+                      Get.width,
+                      Get.width / 2,
+                    ),
+                    backgroundDecoration: BoxDecoration(
+                      color: Get.theme.highlightColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(AppDims.corners),
+                      ),
+                    ),
+                    imageProvider: CachedNetworkImageProvider(
+                      excelController.getCsvTablePath(questionColumnIndex),
+                    ),
+                    minScale: PhotoViewComputedScale.contained * 0.8,
+                    maxScale: PhotoViewComputedScale.covered * 2.0,
+                  ),
+                ),
+              );
+            }),
+          ),
+          // child: SizedBox(
+          //   width: Get.width / 5,
+          //   height: Get.width / 5,
+          //   child: AppCachImage(
+          //       imageUrl: excelController.getCsvTablePath(questionColumnIndex)),
           // ),
         ),
       );
@@ -336,11 +384,11 @@ class QuestionCard extends StatelessWidget {
   Widget questionIndex() {
     return InkWell(
       onTap: () async {
-        await Get.toNamed(
-          AppRoute.questionData,
-          arguments: excelController.csvTable[questionColumnIndex],
-        );
-        examController.reset();
+        // await Get.toNamed(
+        //   AppRoute.questionData,
+        //   arguments: excelController.csvTable[questionColumnIndex],
+        // );
+        // examController.reset();
       },
       child: SizedBox(
         width: Get.width / 18,
@@ -371,7 +419,7 @@ class QuestionCard extends StatelessWidget {
         ).tr(),
         messageText: ElevatedButton(
           onPressed: () async {
-            if (value == '') {
+            if (value == ''&&excelController.isFileEditAble()) {
               Get.toNamed(
                 AppRoute.questionData,
                 arguments: excelController.csvTable[questionColumnIndex],
@@ -398,7 +446,7 @@ class QuestionCard extends StatelessWidget {
     // getPath();
     return InkWell(
       onLongPress: () {
-        deleteSnackBar();
+        !excelController.isFileEditAble() ? null : deleteSnackBar();
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

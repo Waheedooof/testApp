@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:test_maker/controller/theme_controller.dart';
 
 AppBar appCustomAppBar2({
   required List<Widget> actions,

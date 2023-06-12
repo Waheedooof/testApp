@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
 import 'dart:async' show Future;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -68,8 +69,11 @@ class ExcelFileController extends GetxController {
       if (await checkInternet()) {
         statusRequest = StatusRequest.loading;
         update();
-        var response =
-            await uploadData.uploadImageData(teacherCode: '1', file: file);
+        var response = await uploadData.uploadImageData(
+          teacherCode:
+              myServices.sharedPreferences.getString('teacherCode').toString(),
+          file: file,
+        );
         statusRequest = handlingData(response);
         if (statusRequest == StatusRequest.success) {
           if (response.toString().contains(AppLinks.serverLink)) {
@@ -93,6 +97,7 @@ class ExcelFileController extends GetxController {
 
   changeReadMode() {
     readMode = !readMode;
+    update();
   }
 
   displayDrawer(BuildContext context) {
@@ -180,7 +185,6 @@ class ExcelFileController extends GetxController {
       paths.add(
         fileController.getPathFromFile(fileController.files[fileIndex]),
       );
-      print(paths.last);
     }
 
     await Share.shareFiles(
@@ -246,7 +250,6 @@ class ExcelFileController extends GetxController {
       getFileData(filePath);
       print('${filePath}edit');
     }
-
   }
 
   Future editLikeDataFile({
@@ -278,7 +281,6 @@ class ExcelFileController extends GetxController {
   String getCsvTablePath(questionColumnIndex) {
     for (var element in csvTable[questionColumnIndex]) {
       if (element.toString().contains('http')) {
-        print(element.toString());
         return element.toString();
       }
     }
@@ -314,7 +316,11 @@ class ExcelFileController extends GetxController {
 
   void toAddQuesScreen() {
     reset();
-    Get.toNamed(AppRoute.addQuesPage);
+    showEditAbleSnackBar();
+    ExcelFileController excelFileController = Get.find();
+    excelFileController.isFileEditAble()
+        ? Get.toNamed(AppRoute.addQuesPage)
+        : null;
   }
 
   void toAddFileScreen() {
@@ -342,11 +348,13 @@ class ExcelFileController extends GetxController {
       } else {
         isUploaded = true;
         if (questionAddRow.toString().contains('path:')) {
-          questionAddRow[questionAddRow.length - 1] = await uploadImage(
+          questionAddRow.last = await uploadImage(
             File(
-              questionAddRow[questionAddRow.length - 1]
-                  .replaceAll('path:', '')
-                  .replaceAll(']', ''),
+              questionAddRow
+                  .where((element) => element.toString().contains('path:'))
+                  .toList()
+                  .first
+                  .replaceAll('path:', ''),
             ),
           );
         }
@@ -363,9 +371,11 @@ class ExcelFileController extends GetxController {
         }
       }
     } else {
-      Get.toNamed(AppRoute.writeFilePage)?.whenComplete(() {
-        Get.toNamed(AppRoute.addQuesPage);
-      });
+      Get.toNamed(AppRoute.writeFilePage)?.whenComplete(
+        () {
+          Get.toNamed(AppRoute.addQuesPage);
+        },
+      );
     }
   }
 
@@ -399,27 +409,31 @@ class ExcelFileController extends GetxController {
 
   showEditAbleSnackBar() {
     ExcelFileController excelFileController = Get.find();
-    return Get.showSnackbar(
-      GetSnackBar(
-        duration: const Duration(seconds: 4),
-        messageText: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Text(
-              excelFileController.isFileEditAble() ? 'EditAble' : 'NotEditAble',
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                color: excelFileController.isFileEditAble()
-                    ? Colors.green
-                    : Colors.red,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+    return !excelFileController.isFileEditAble()
+        ? Get.showSnackbar(
+            GetSnackBar(
+              duration: const Duration(seconds: 4),
+              messageText: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    excelFileController.isFileEditAble()
+                        ? 'EditAble'
+                        : 'NotEditAble',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      color: excelFileController.isFileEditAble()
+                          ? Colors.green
+                          : Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ).tr(),
+                ),
               ),
-            ).tr(),
-          ),
-        ),
-      ),
-    );
+            ),
+          )
+        : null;
   }
 
   isFileEditAble() {
@@ -450,15 +464,56 @@ class ExcelFileController extends GetxController {
     } else {
       searchQuestionsMode = !searchQuestionsMode;
     }
+    update();
   }
 
   Future<void> addImagePath() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
-
+    var pickedImage = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 5,
+    );
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: pickedImage!.path,
+      // maxHeight: 512,
+      // maxWidth: 1024,
+      cropStyle: CropStyle.rectangle,
+      aspectRatio: const CropAspectRatio(ratioX: 16, ratioY: 9),
+      aspectRatioPresets: [
+        // CropAspectRatioPreset.square,
+        // CropAspectRatioPreset.ratio3x2,
+        // CropAspectRatioPreset.original,
+        // CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9,
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: tr('crop_image'),
+          toolbarColor: Get.theme.primaryColor,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: true,
+        ),
+        IOSUiSettings(
+          title: tr('crop_image'),
+          aspectRatioLockEnabled: true,
+        ),
+      ],
+    );
+    pickedImage = XFile(croppedFile!.path);
     if (pickedImage != null) {
       print(questionAddRow);
-      questionAddRow.add('path:${pickedImage.path}');
+      if (questionAddRow.toString().contains('path:')) {
+        for (var element in questionAddRow) {
+          if (element.toString().contains('path:')) {
+            int index = questionAddRow.indexOf(element);
+
+            questionAddRow[index] = 'path:${pickedImage.path}';
+          }
+        }
+      } else {
+        questionAddRow.add('path:${pickedImage.path}');
+      }
       update();
       print(questionAddRow);
     }
@@ -510,7 +565,7 @@ class ExcelFileController extends GetxController {
 
   Future<bool> removerImageSever(int deletedRowIndex) async {
     if (getRowImageUrl(deletedRowIndex) == '') {
-      return false;
+      return true;
     } else {
       if (await checkInternet()) {
         statusRequest = StatusRequest.loading;
@@ -522,7 +577,6 @@ class ExcelFileController extends GetxController {
         print(response);
         statusRequest = handlingData(response);
         if (statusRequest == StatusRequest.success) {
-
           return true;
         } else {
           statusRequest = StatusRequest.serverExp;
@@ -536,10 +590,11 @@ class ExcelFileController extends GetxController {
 
   getRowImageUrl(int deletedRowIndex) {
     String path = '';
-    for (var element in csvTable[deletedRowIndex]) {
-      if (element.toString().contains('https')) {
-        path = element.toString();
-      }
+    if (csvTable[deletedRowIndex].toString().contains('https')) {
+      path = csvTable[deletedRowIndex]
+          .where((element) => element.toString().contains('https:'))
+          .toList()
+          .first;
     }
     return path;
     print('deleteServerImage: $path');
