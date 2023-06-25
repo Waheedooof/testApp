@@ -1,16 +1,26 @@
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io' as io;
 
-import 'exam_cont.dart';
+import '../../core/class/statusrequest.dart';
+import '../../core/function/checkinternet.dart';
+import '../../core/services/services.dart';
+import '../../data/datasource/remote/home/removeImages.dart';
 import 'excel_file_cont.dart';
 
 class FilesController extends GetxController {
   List<dynamic> files = [];
 
   List<int> deleteIndexFiles = [];
+  StatusRequest? statusRequest = StatusRequest.none;
+  MyServices myServices = Get.find();
 
+  RemoveListImagesData listImagesData = RemoveListImagesData(Get.find());
   TextEditingController searchController = TextEditingController();
 
   bool showFilesList = false;
@@ -26,6 +36,35 @@ class FilesController extends GetxController {
   changeShowList() {
     showFilesList = !showFilesList;
     update();
+  }
+
+  List<String> names = [];
+
+  Future<List<String>> getFileImagesName(filePath) async {
+    names.clear();
+    var data = '';
+    List<List<dynamic>> csvTable = [];
+
+    File file = File(filePath);
+    data = file.readAsStringSync();
+    if (data.isEmpty) {
+      data = 'No Questions has Added';
+    } else {
+      csvTable = const CsvToListConverter().convert(data);
+      if (csvTable.toString().contains('https:')) {
+        for (var element in csvTable) {
+          String name = element
+              .where((element) => element.toString().contains('https:'))
+              .toList()
+              .first;
+          names.add(basename(name));
+        }
+      }
+      print(names);
+    }
+
+    update();
+    return [''];
   }
 
   // Make New Function
@@ -48,14 +87,26 @@ class FilesController extends GetxController {
     ExcelFileController excelFileController = Get.find();
 
     for (int index in deleteIndexFiles) {
-      await excelFileController.deleteFile(
-        getPathFromFile(files[index]),
-      );
+      await getFileImagesName(files[index].path);
+      if (await deleteImagesServer(names)) {
+        await excelFileController.deleteFile(
+          getPathFromFile(
+            files[index],
+          ),
+        );
+
+        getListFiles();
+        excelFileController.reset();
+        excelFileController.refreshList();
+        Get.back();
+      } else {}
+
+
     }
-    deleteIndexFiles.clear();
-    ExamController examController = Get.find();
-    examController.reset();
-    getListFiles();
+    // deleteIndexFiles.clear();
+    // ExamController examController = Get.find();
+    // examController.reset();
+    // getListFiles();
     update();
   }
 
@@ -100,5 +151,39 @@ class FilesController extends GetxController {
       searchMode = false;
     }
     update();
+  }
+
+  Future<bool> deleteImagesServer(List<String> basenames) async {
+    if (names.isNotEmpty) {
+      if (await checkInternet()) {
+        statusRequest = StatusRequest.loading;
+        update();
+
+        try {
+          var response = await listImagesData.removeListImagesData(
+              listImagesNames: basenames);
+          print('===========deleteImagesServer===${response}======');
+          if (response.toString().contains('Image deleted successfully')) {
+            statusRequest = StatusRequest.success;
+            update();
+            return true;
+          } else {
+            statusRequest = StatusRequest.failure;
+          }
+        } catch (e) {
+          print('===========deleteImagesServer catch=========');
+          statusRequest = StatusRequest.failure;
+        }
+      } else {
+        statusRequest = StatusRequest.serverExp;
+      }
+
+      print(statusRequest);
+      statusRequest = StatusRequest.success;
+      update();
+      return false;
+    } else {
+      return true;
+    }
   }
 }

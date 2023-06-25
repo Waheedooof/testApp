@@ -1,21 +1,15 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/_http/_io/_file_decoder_io.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:test_maker/controller/home_controllers/exam_cont.dart';
 import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:get/get.dart';
-import 'package:test_maker/controller/question_controllers/question_controller.dart';
 import 'package:test_maker/core/class/handelingview.dart';
 import 'package:test_maker/core/constant/approutes.dart';
 import 'package:test_maker/view/screen/imagePage.dart';
-import 'package:test_maker/view/widget/appcachiamge.dart';
-
-import '../../../core/constant/app_color.dart';
 import '../../../core/theme/app_dimentions.dart';
 
 class QuestionCard extends StatelessWidget {
@@ -146,9 +140,11 @@ class QuestionCard extends StatelessWidget {
             : await Get.toNamed(
                 AppRoute.questionData,
                 arguments: excelController.csvTable[questionColumnIndex],
-              )?.whenComplete(() {
-                examController.reset();
-              });
+              )?.whenComplete(
+                () {
+                  examController.reset();
+                },
+              );
       },
       child: Column(
         children: [
@@ -166,18 +162,44 @@ class QuestionCard extends StatelessWidget {
                 const SizedBox(
                   width: 8,
                 ),
+                // Expanded(
+                //   child: Math.tex(
+                //     r'\hat f(\xi) = \int_{-\infty}^\infty f(x)e^{- 2\pi i \xi x}\mathrm{d}x',
+                //     textStyle: TextStyle(
+                //       fontSize: 19,
+                //       color: Get.theme.primaryColor,
+                //     ),
+                //   ),
+                // ),
                 Expanded(
-                  child: Text(
-                    excelController.csvTable[questionColumnIndex][0].toString(),
-                    textAlign: Get.locale?.languageCode == 'en'
-                        ? TextAlign.left
-                        : TextAlign.right,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Get.theme.highlightColor,
-                      fontSize: 13,
-                    ),
-                  ),
+                  child: excelController.csvTable[questionColumnIndex][0]
+                          .toString()
+                          .contains('{')
+                      ? Math.tex(
+                          excelController.csvTable[questionColumnIndex][0]
+                              .toString(),
+                          // textAlign: Get.locale?.languageCode == 'en'
+                          //     ? TextAlign.left
+                          //     : TextAlign.right,
+                          textStyle: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Get.theme.highlightColor,
+                            fontSize: 13,
+                            locale: const Locale('ar', 'DZ'),
+                          ),
+                        )
+                      : Text(
+                          excelController.csvTable[questionColumnIndex][0]
+                              .toString(),
+                          textAlign: Get.locale?.languageCode == 'en'
+                              ? TextAlign.left
+                              : TextAlign.right,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Get.theme.highlightColor,
+                            fontSize: 13,
+                          ),
+                        ),
                 ),
               ],
             ),
@@ -248,14 +270,30 @@ class QuestionCard extends StatelessWidget {
             : getAnswersColor(indexInRow),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-          child: Text(
-            '${excelController.csvTable[questionColumnIndex][indexInRow]}',
-            style: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontSize: 11,
-              color: getTextColor(indexInRow),
-            ),
-          ),
+          child: excelController.csvTable[questionColumnIndex][indexInRow]
+                  .toString()
+                  .contains('}')
+              ? Math.tex(
+                  excelController.csvTable[questionColumnIndex][indexInRow]
+                      .toString(),
+
+                  // textAlign: Get.locale?.languageCode == 'en'
+                  //     ? TextAlign.left
+                  //     : TextAlign.right,
+                  textStyle: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    color: getTextColor(indexInRow),
+                    fontSize: 13,
+                  ),
+                )
+              : Text(
+                  '${excelController.csvTable[questionColumnIndex][indexInRow]}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 11,
+                    color: getTextColor(indexInRow),
+                  ),
+                ),
         ),
       ),
     );
@@ -419,7 +457,7 @@ class QuestionCard extends StatelessWidget {
         ).tr(),
         messageText: ElevatedButton(
           onPressed: () async {
-            if (value == ''&&excelController.isFileEditAble()) {
+            if (value == '' && excelController.isFileEditAble()) {
               Get.toNamed(
                 AppRoute.questionData,
                 arguments: excelController.csvTable[questionColumnIndex],

@@ -4,10 +4,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
 import 'package:test_maker/controller/auth_controller.dart';
 import 'package:test_maker/controller/home_controllers/home_page_cont.dart';
 import 'package:test_maker/controller/theme_controller.dart';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:test_maker/core/class/handelingview.dart';
 import '../../controller/home_controllers/exam_cont.dart';
 import '../../controller/home_controllers/excel_file_cont.dart';
 import '../../controller/home_controllers/files_contoller.dart';
@@ -197,7 +199,8 @@ class DrawerWidget extends StatelessWidget {
       );
     }
 
-    void deleteSnackBar(FilesController fileController, int index) {
+    Future<void> deleteSnackBar(
+        FilesController fileController, int index) async {
       Get.showSnackbar(
         GetSnackBar(
           backgroundColor: context.theme.scaffoldBackgroundColor,
@@ -209,15 +212,22 @@ class DrawerWidget extends StatelessWidget {
             ),
           ).tr(),
           messageText: ElevatedButton(
-            onPressed: () {
-              excelFileController.deleteFile(
-                getPathFromFile(
-                  fileController.files[index],
-                ),
-              );
-              examController.reset();
-              fileController.getListFiles();
-              Get.back();
+            onPressed: () async {
+              await filesController
+                  .getFileImagesName(filesController.files[index].path);
+              if (await filesController
+                  .deleteImagesServer(filesController.names)) {
+                await excelFileController.deleteFile(
+                  getPathFromFile(
+                    fileController.files[index],
+                  ),
+                );
+
+                fileController.getListFiles();
+                excelFileController.reset();
+                excelFileController.refreshList();
+                Get.back();
+              } else {}
             },
             child: const Text('ok').tr(),
           ),
@@ -231,10 +241,12 @@ class DrawerWidget extends StatelessWidget {
         builder: (context) => Theme(
           data: ThemeApp().getDialogTheme(),
           child: AlertDialog(
-            titlePadding: const EdgeInsets.all(10),
+            icon: const Icon(Icons.file_copy_outlined),
+            titlePadding: const EdgeInsets.all(22),
             title: Text(
-                tr(excelFileController.fileTitle.split('/').last.toString()),
-                textAlign: TextAlign.center),
+              basename(excelFileController.fileTitle).replaceAll('.csv', ''),
+              textAlign: TextAlign.center,
+            ),
             content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -324,45 +336,52 @@ class DrawerWidget extends StatelessWidget {
                         examController.reset();
                         Get.back();
                       },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: getPathFromFile(fileController.files[index]) ==
-                                  excelFileController.fileTitle
-                              ? context.theme.primaryColor.withOpacity(0.8)
-                              : null,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(11),
-                          child: Row(
-                            children: [
-                              Text(
-                                (fileController.files.length - index)
-                                    .toString(),
-                                style: TextStyle(
-                                  color: context.theme.highlightColor,
-                                ),
+                      child: GetBuilder<FilesController>(
+                        builder: (controller) => HandelingView(
+                          statusRequest: controller.statusRequest!,
+                          widget: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: getPathFromFile(
+                                          fileController.files[index]) ==
+                                      excelFileController.fileTitle
+                                  ? context.theme.primaryColor.withOpacity(0.8)
+                                  : null,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(11),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    (fileController.files.length - index)
+                                        .toString(),
+                                    style: TextStyle(
+                                      color: context.theme.highlightColor,
+                                    ),
+                                  ),
+                                  Expanded(child: Container()),
+                                  Text(
+                                    getFirstName(getPathFromFile(
+                                      fileController.files[index],
+                                    ).split('/').last),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: getPathFromFile(fileController
+                                                  .files[index]) ==
+                                              excelFileController.fileTitle
+                                          ? context
+                                              .theme.scaffoldBackgroundColor
+                                          : context.theme.highlightColor,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(),
+                                  ),
+                                ],
                               ),
-                              Expanded(child: Container()),
-                              Text(
-                                getFirstName(getPathFromFile(
-                                  fileController.files[index],
-                                ).split('/').last),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: getPathFromFile(
-                                              fileController.files[index]) ==
-                                          excelFileController.fileTitle
-                                      ? context.theme.scaffoldBackgroundColor
-                                      : context.theme.highlightColor,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Container(),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),

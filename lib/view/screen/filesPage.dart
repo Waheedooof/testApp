@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:test_maker/core/class/handelingview.dart';
 import 'package:test_maker/view/screen/home.dart';
 
 import '../../controller/home_controllers/exam_cont.dart';
@@ -41,27 +42,30 @@ class FilesPage extends StatelessWidget {
                 style: Get.textTheme.bodyText1,
               ).tr(),
             )
-          : ListView.builder(
-              reverse: false,
-              shrinkWrap: true,
-              primary: false,
-              itemCount: filesBuilderController.files.length,
-              itemBuilder: (context, index) {
-                if (filesBuilderController.searchController.text.isNotEmpty) {
-                  if (getFirstName(
-                    getPathFromFile(
-                      filesBuilderController.files[index],
-                    ).split('/').last,
-                  ).isCaseInsensitiveContainsAny(
-                      filesBuilderController.searchController.text)) {
-                    return fileWidget(index);
+          : HandelingView(
+              statusRequest: filesController.statusRequest!,
+              widget: ListView.builder(
+                reverse: false,
+                shrinkWrap: true,
+                primary: false,
+                itemCount: filesBuilderController.files.length,
+                itemBuilder: (context, index) {
+                  if (filesBuilderController.searchController.text.isNotEmpty) {
+                    if (getFirstName(
+                      getPathFromFile(
+                        filesBuilderController.files[index],
+                      ).split('/').last,
+                    ).isCaseInsensitiveContainsAny(
+                        filesBuilderController.searchController.text)) {
+                      return fileWidget(index);
+                    } else {
+                      return Container();
+                    }
                   } else {
-                    return Container();
+                    return fileWidget(index);
                   }
-                } else {
-                  return fileWidget(index);
-                }
-              },
+                },
+              ),
             ),
     );
   }

@@ -25,14 +25,14 @@ class HomeController extends GetxController {
       },
     );
 
-    if(isWalk) {
-      gyroscopeEvents.listen((GyroscopeEvent event) {
-      rotationX = event.x * 0.03;
-      rotationY = event.y * 0.03;
-      rotationZ = event.z * 0.03;
-      update();
+    gyroscopeEvents.listen((GyroscopeEvent event) {
+      if (isWalk) {
+        rotationX = event.x * 0.04;
+        rotationY = event.y * 0.04;
+        rotationZ = event.z * 0.04;
+        update();
+      }
     });
-    }
     super.onInit();
   }
 

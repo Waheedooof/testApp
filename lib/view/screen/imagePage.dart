@@ -7,7 +7,7 @@ import 'package:test_maker/view/widget/appbar.dart';
 class ImageViewer extends StatelessWidget {
   final String imagePath;
 
-  ImageViewer({required this.imagePath});
+  const ImageViewer({required this.imagePath});
 
   @override
   Widget build(BuildContext context) {

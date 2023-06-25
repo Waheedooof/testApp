@@ -54,26 +54,28 @@ class HandelingRequest extends StatelessWidget {
     } else if (statusRequest == StatusRequest.serverExp ||
         statusRequest == StatusRequest.offline) {
       return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          widget,
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: const Text('network_error',
-                    style: TextStyle(color: Colors.red))
+                style: TextStyle(color: Colors.red))
                 .tr(),
           ),
-          widget
         ],
       );
     } else if (statusRequest == StatusRequest.failure) {
       return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          widget,
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: const Text('auth_error',
                     style: TextStyle(color: Colors.red))
                 .tr(),
           ),
-          widget
         ],
       );
     } else {

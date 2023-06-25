@@ -22,7 +22,7 @@ class ThemeApp {
       textTheme: TextTheme(
         bodyText1: TextStyle(
           color: AppColor.lightText,
-          fontSize: 14,
+          fontSize: 11,
           fontWeight: FontWeight.normal,
         ),
       ),
@@ -49,7 +49,7 @@ class ThemeApp {
       textTheme: TextTheme(
         bodyText1: TextStyle(
           color: AppColor.darkText,
-          fontSize: 14,
+          fontSize: 11,
           fontWeight: FontWeight.normal,
         ),
       ),

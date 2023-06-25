@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:math_keyboard/math_keyboard.dart';
 import 'package:path/path.dart';
-import 'package:path/path.dart' as path;
 import 'dart:async' show Future;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -37,11 +37,13 @@ class ExcelFileController extends GetxController {
   bool searchQuestionsMode = false;
   TextEditingController searchQuestionController = TextEditingController();
   TextEditingController textQuesController = TextEditingController();
+  MathFieldEditingController textQuesControllerMath = MathFieldEditingController();
   bool readMode = false;
   MyServices myServices = Get.find();
   final UploadData uploadData = UploadData(Get.find());
   final RemoveData removeData = RemoveData(Get.find());
   StatusRequest statusRequest = StatusRequest.none;
+
 
   @override
   void onInit() {
@@ -60,6 +62,11 @@ class ExcelFileController extends GetxController {
       }
     }
     return '';
+  }
+  bool mathMode = false;
+  changeMath(){
+    mathMode=!mathMode;
+    update();
   }
 
   Future<String> uploadImage(File file) async {
@@ -597,6 +604,5 @@ class ExcelFileController extends GetxController {
           .first;
     }
     return path;
-    print('deleteServerImage: $path');
   }
 }

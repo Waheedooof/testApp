@@ -9,6 +9,7 @@ import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:get/get.dart';
 import 'package:test_maker/controller/home_controllers/home_page_cont.dart';
 import 'package:test_maker/view/widget/home/question_card.dart';
+import '../../core/constant/approutes.dart';
 import '../widget/drawer.dart';
 import '../widget/home/title_widget.dart';
 
@@ -21,12 +22,12 @@ class HomePage extends StatelessWidget {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         childCount: excelFileController.csvTable.length,
-        (context, index) {
+            (context, index) {
           if (excelFileController.searchQuestionController.text.isNotEmpty) {
             if (excelFileController.csvTable[index]
                 .toString()
                 .isCaseInsensitiveContainsAny(
-                    excelFileController.searchQuestionController.text)) {
+                excelFileController.searchQuestionController.text)) {
               return QuestionCard(
                 questionColumnIndex: homeController.isReverseList.value
                     ? excelFileController.csvTable.length - 1 - index
@@ -47,17 +48,15 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  readFileWidget() {
+  writeFileWidget() {
     return ElevatedButton(
       onPressed: () async {
-        excelFileController.pickFile('');
-        // await excelFileController.open2();
-        Get.back();
+        Get.toNamed(AppRoute.writeFilePage);
       },
       child: ListTile(
-        trailing: const Icon(Icons.read_more),
+        trailing: const Icon(Icons.edit),
         title: Text(
-          'read',
+          'write',
           style: TextStyle(
             color: Get.theme.scaffoldBackgroundColor,
           ),
@@ -96,7 +95,7 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 20),
               writeQuestionWidget(),
               const SizedBox(height: 20),
-              readFileWidget(),
+              writeFileWidget(),
               SizedBox(
                 height: Get.height / 4,
                 child: Center(
@@ -132,14 +131,16 @@ class HomePage extends StatelessWidget {
   Matrix4? transform(HomeController homeController) {
     return homeController.isWalk
         ? Matrix4.rotationX(homeController.rotationX)
-            .multiplied(Matrix4.rotationY(homeController.rotationY))
-            .multiplied(Matrix4.rotationZ(homeController.rotationZ))
+        .multiplied(Matrix4.rotationY(homeController.rotationY))
+        .multiplied(Matrix4.rotationZ(homeController.rotationZ))
         : null;
   }
 
   appBar(context) {
     return SliverAppBar(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme
+          .of(context)
+          .scaffoldBackgroundColor,
       snap: false,
       floating: false,
       stretch: true,
@@ -155,8 +156,14 @@ class HomePage extends StatelessWidget {
           excelFileController.displayDrawer(context);
         },
       ),
-      expandedHeight: MediaQuery.of(context).size.height / 7,
-      toolbarHeight: MediaQuery.of(context).size.height / 17,
+      expandedHeight: MediaQuery
+          .of(context)
+          .size
+          .height / 7,
+      toolbarHeight: MediaQuery
+          .of(context)
+          .size
+          .height / 17,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Get.theme.scaffoldBackgroundColor,
         statusBarIconBrightness: Get.theme.brightness,
@@ -174,27 +181,27 @@ class HomePage extends StatelessWidget {
     Get.isSnackbarOpen
         ? exit(0)
         : excelFileController.scaffoldKey.currentState!.isDrawerOpen
-            ? excelFileController.endDrawer(context)
-            : Get.showSnackbar(
-                GetSnackBar(
-                  messageText: Row(
-                    children: [
-                      Text(
-                        tr('close'),
-                        style: TextStyle(color: Get.theme.primaryColor),
-                      ),
-                      Expanded(child: Container()),
-                      ElevatedButton(
-                        onPressed: () {
-                          exit(0);
-                        },
-                        child: const Text('ok').tr(),
-                      )
-                    ],
-                  ),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+        ? excelFileController.endDrawer(context)
+        : Get.showSnackbar(
+      GetSnackBar(
+        messageText: Row(
+          children: [
+            Text(
+              tr('close'),
+              style: TextStyle(color: Get.theme.primaryColor),
+            ),
+            Expanded(child: Container()),
+            ElevatedButton(
+              onPressed: () {
+                exit(0);
+              },
+              child: const Text('ok').tr(),
+            )
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   Widget builder(BuildContext context) {
@@ -213,7 +220,7 @@ class HomePage extends StatelessWidget {
           excelFileController.toAddQuesScreen();
         }
       } else if (details.primaryVelocity! < 0 &&
-              Get.locale?.languageCode == 'ar' ||
+          Get.locale?.languageCode == 'ar' ||
           details.primaryVelocity! > 0 && Get.locale?.languageCode == 'en') {
         excelFileController.displayDrawer(context);
       }
@@ -244,7 +251,7 @@ class HomePage extends StatelessWidget {
                     body: GetBuilder<HomeController>(
                       builder: (homeController) {
                         return AnimatedContainer(
-                          duration: const Duration(milliseconds: 50),
+                          duration: const Duration(milliseconds: 10),
                           transform: transform(homeController),
                           child: RefreshIndicator(
                             edgeOffset: Get.height / 8,

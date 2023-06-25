@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:test_maker/controller/question_controllers/question_controller.dart';
 import 'package:test_maker/core/class/handelingview.dart';
 
@@ -18,6 +17,71 @@ class QuestionDataPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     QuestionController questionController = Get.put(QuestionController());
+    appTextField(int index) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.1),
+          border: Border.all(
+            width: 1,
+            color: Get.theme.primaryColor.withOpacity(0.4),
+          ),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(8),
+          ),
+        ),
+        child: TextFormField(
+          cursorColor: Get.theme.primaryColor.withOpacity(0.4),
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(2),
+            border: InputBorder.none,
+          ),
+          controller: TextEditingController(
+            text: questionController.questionRow[index].toString(),
+          ),
+          autofocus: false,
+          textInputAction: TextInputAction.next,
+          // enabled: true,
+          maxLines: index == 0 ? 3 : 1,
+          style: Get.textTheme.bodyText1,
+          textAlign: TextAlign.center,
+          // padding: const EdgeInsets.all(8),
+          onChanged: (value) {
+            questionController.editLabel(
+              value,
+              index,
+            );
+          },
+        ),
+      );
+      return CupertinoTextField(
+        enableInteractiveSelection: true,
+        enabled: true,
+        maxLines: index == 0 ? 3 : 1,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Get.theme.primaryColor,
+          ),
+          color: Colors.grey.withOpacity(0.2),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
+        style: Get.textTheme.bodyText1!.copyWith(fontSize: 11),
+        textAlign: TextAlign.center,
+        padding: const EdgeInsets.all(10),
+        controller: TextEditingController(
+          text: questionController.questionRow[index].toString(),
+        ),
+        onChanged: (value) {
+          print('$index $value');
+          questionController.editLabel(
+            value,
+            index,
+          );
+        },
+      );
+    }
+
     imageWidget() {
       print(questionController.questionRow);
       if (questionController.isContainHttp(questionController.questionRow)) {
@@ -75,9 +139,9 @@ class QuestionDataPage extends StatelessWidget {
 
     return GestureDetector(
       onHorizontalDragEnd: (DragEndDetails details) {
-        if (details.primaryVelocity! > 0) {
-          Get.back();
-        }
+        // if (details.primaryVelocity! > 0) {
+        //   Get.back();
+        // }
       },
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
@@ -189,38 +253,7 @@ class QuestionDataPage extends StatelessWidget {
                                           ),
                                         ),
                                         Expanded(
-                                          child: CupertinoTextField(
-                                            enableInteractiveSelection: true,
-                                            enabled: true,
-                                            maxLines: index == 0 ? 3 : 1,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Get.theme.primaryColor,
-                                              ),
-                                              color:
-                                                  Colors.grey.withOpacity(0.2),
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                Radius.circular(12),
-                                              ),
-                                            ),
-                                            style: Get.textTheme.bodyText1!
-                                                .copyWith(fontSize: 11),
-                                            textAlign: TextAlign.center,
-                                            padding: const EdgeInsets.all(10),
-                                            controller: TextEditingController(
-                                              text: questionController
-                                                  .questionRow[index]
-                                                  .toString(),
-                                            ),
-                                            onChanged: (value) {
-                                              print('$index $value');
-                                              questionController.editLabel(
-                                                value,
-                                                index,
-                                              );
-                                            },
-                                          ),
+                                          child: appTextField(index),
                                         ),
                                       ],
                                     ),

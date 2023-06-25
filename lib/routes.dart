@@ -1,4 +1,3 @@
-import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:get/get.dart';
 import 'package:test_maker/view/screen/addQues_page.dart';
 import 'package:test_maker/view/screen/authPage.dart';

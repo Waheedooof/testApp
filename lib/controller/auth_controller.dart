@@ -1,11 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test_maker/controller/home_controllers/exam_cont.dart';
-import 'package:test_maker/controller/home_controllers/excel_file_cont.dart';
 import 'package:test_maker/core/constant/approutes.dart';
 import 'package:test_maker/core/services/services.dart';
+import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
 
 import '../core/class/statusrequest.dart';
 import '../core/function/checkinternet.dart';
@@ -29,35 +28,41 @@ class AuthController extends GetxController {
   }
 
   login() async {
-    if (await checkInternet()) {
-      statusRequest = StatusRequest.loading;
-      update();
+    passwordTextController.text=passwordTextController.text.removeAllWhitespace;
+    if(passwordTextController.text.length>=6) {
+      if (await checkInternet()) {
+        statusRequest = StatusRequest.loading;
+        update();
 
-      try {
-        var response = await loginData.loginTeacher(
-          teacherCode: passwordTextController.text,
-        );
-        print('===========login===${response}======');
-        if (response['status'] == 'success') {
-          statusRequest = StatusRequest.success;
-       await myServices.sharedPreferences.setString('password',DateTime.now().year.toString());
-       await myServices.sharedPreferences.setString('teacherCode',passwordTextController.text);
-          Get.offNamed(AppRoute.homePage);
-        } else {
+        try {
+          var response = await loginData.loginTeacher(
+            teacherCode: passwordTextController.text,
+          );
+          print('===========login===${response}======');
+          if (response['status'] == 'success') {
+            statusRequest = StatusRequest.success;
+            await myServices.sharedPreferences
+                .setString('password', DateTime.now().year.toString());
+            await myServices.sharedPreferences
+                .setString('teacherCode', passwordTextController.text);
+            Get.offNamed(AppRoute.homePage);
+          } else {
+            statusRequest = StatusRequest.failure;
+          }
+        } catch (e) {
+          print('===========login catch=========');
           statusRequest = StatusRequest.failure;
         }
-      } catch (e) {
-        print('===========login catch=========');
-        statusRequest = StatusRequest.failure;
+
+        print(statusRequest);
+      } else {
+        statusRequest = StatusRequest.serverExp;
       }
+    }else{
+      statusRequest = StatusRequest.failure;
 
-      print(statusRequest);
-    } else {
-      statusRequest = StatusRequest.serverExp;
     }
-
     update();
-
   }
 
   changeShowText() {
@@ -70,5 +75,19 @@ class AuthController extends GetxController {
     await myServices.sharedPreferences.remove('tablePath');
     ExamController().reset();
     Get.offNamed(AppRoute.authPage);
+  }
+
+  Future<void> scan(BuildContext context) async {
+    try {
+      QrBarCodeScannerDialog().getScannedQrBarCode(
+          context: context,
+          onCode: (code) async {
+            print(code);
+            passwordTextController.text = code!;
+            await login();
+          });
+    } catch (e) {
+      // Handle any scanning errors
+    }
   }
 }

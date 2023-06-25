@@ -31,6 +31,32 @@ class Crud {
     }
   }
 
+  Future<Either<StatusRequest, Map>> sendImageList(
+      String urlLink, List<String> imageList) async {
+    var requestBody = {'imageList': imageList};
+    try {
+      if (await checkInternet()) {
+        var response = await http.post(
+          Uri.parse(urlLink),
+          body: jsonEncode(requestBody),
+          headers: {'Content-Type': 'application/json'},
+        );
+
+        if (response.statusCode == 200) {
+          // if (response.body.toString().contains('Image deleted successfully')) {
+          // } else {}
+          return Right(jsonDecode(response.body));
+        }  else {
+          return const Left(StatusRequest.failure);
+        }
+      } else {
+        return const Left(StatusRequest.offline);
+      }
+    } catch (_) {
+      return const Left(StatusRequest.serverExp);
+    }
+  }
+
   Future<Either<StatusRequest, String>> postDataWithImage(
     String urlLink,
     Map data,
